@@ -23,3 +23,12 @@
 **/.impeccable/live/pending-manual-edits.json
 **/.impeccable/live/deferred-svelte-component-accepts.json
 **/.impeccable/live/*.png
+
+# Application and local database
+/node_modules/
+/.next/
+/coverage/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example

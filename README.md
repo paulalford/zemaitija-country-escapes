@@ -1,6 +1,6 @@
 # Žemaitija Country Escapes
 
-**Status:** Milestone 1 — business identity, location and scope documented. No application implementation yet.
+**Status:** Milestone 5 foundation: minimal Next.js placeholder and PostgreSQL schema. Booking and payment workflows are not implemented.
 
 A three-language, full-stack **fictional Lithuanian countryside accommodation booking platform**, demonstrating inventory concurrency, secure test payments, two-stage payment scheduling, guest self-service, cancellation/refund handling and operational workflows.
 
@@ -28,4 +28,6 @@ A three-language, full-stack **fictional Lithuanian countryside accommodation bo
 - Free guest cancellation before the 14-day cutoff; proportionate late charge **up to 30%**, subject to review/mitigation
 - Guest self-service, notification logs, auditable administrative workflows
 
-**No coding until payment and inventory domain specifications are reviewed.**
+## Local foundation
+
+See [Milestone 5 setup and verification](docs/MILESTONE_05.md). Run `npm ci`, start the localhost PostgreSQL service, apply versioned migrations, and run the database tests before later milestones. The placeholder does not accept bookings or payments.

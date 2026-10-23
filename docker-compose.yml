@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:17.6
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zemaitija_bootstrap}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-bootstrap-local}
+      POSTGRES_DB: ${POSTGRES_DB:-zemaitija_dev}
+      APP_DB_USER: ${APP_DB_USER:-zemaitija_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:-change-app-local}
+      MIGRATION_DB_USER: ${MIGRATION_DB_USER:-zemaitija_migrator}
+      MIGRATION_DB_PASSWORD: ${MIGRATION_DB_PASSWORD:-change-migration-local}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+volumes:
+  postgres_data:
