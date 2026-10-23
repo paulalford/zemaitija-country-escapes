@@ -32,7 +32,7 @@ Dates are recorded in ISO format. `Approved` = user-approved project scope or pr
 
 ### Authoritative technical note — Stripe Checkout expiry
 
-Stripe Checkout Session creation currently documents `expires_at` from **30 minutes to 24 hours** after creation, defaulting to 24 hours. The earlier 15-minute hold would not be aligned with a normal configured Stripe-hosted checkout session; use a synchronized provisional 30-minute inventory hold and session expiry, and test late-event reconciliation.
+Stripe Checkout Session creation currently documents `expires_at` from **30 minutes to 24 hours** after creation, defaulting to 24 hours. The earlier 15-minute hold would not be aligned with a normal configured Stripe-hosted checkout session. The configured 30-minute Checkout window begins at provider Session creation; the database inventory claim begins earlier and may remain blocking beyond Session expiry during unresolved reconciliation. Release the claim only after authoritative payment-state reconciliation, and test late-event reconciliation.
 
 Source: https://docs.stripe.com/api/checkout/sessions/create
 
