@@ -25,6 +25,10 @@ Dates are recorded in ISO format. `Approved` = user-approved project scope or pr
 | D19 | Delayed/asynchronous payment methods | Gate for payment milestone | Either restrict to synchronously settled test payment methods or implement a safe pending lifecycle |
 | D20 | e.turistas reporting method | Gate before live paid bookings | No claimed official API integration without documentation |
 | D21 | No PHP in any project component | Approved, non-negotiable | TypeScript/Next.js and PostgreSQL; no PHP CMS, plugins, runtimes, scripts or endpoints |
+| D22 | Impeccable mandatory for frontend design | Approved, mandatory | Actively invoke for design direction, review and refinement before UI-related milestone approval; backend-only work is outside scope |
+| D23 | Generic AI-generated visual design is unacceptable | Approved | Avoid predictable SaaS layouts and template-like decoration; preserve truthful regional hospitality identity |
+| D24 | Image-composition-first for landing and showcase surfaces | Approved | Includes accommodation showcase and visually expressive marketing pages; functional application screens may start in code with Impeccable review |
+| D25 | UX, accessibility and booking usability before decorative effects | Approved | Guest booking journey is the primary design priority; operators and portfolio reviewers follow |
 
 ### Authoritative technical note — Stripe Checkout expiry
 

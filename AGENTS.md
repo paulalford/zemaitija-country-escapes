@@ -30,3 +30,13 @@ Read the relevant repository specifications before changing code. Keep work stri
 - Present test results and files changed, plus any deviations/risks.
 - Preserve approved policies and copy; ask or raise an explicit gate if unresolved issues make the change unsafe.
 - Prefer focused requests and normal CLI verification to conserve Codex usage.
+
+## Mandatory Design Workflow — Impeccable
+
+- For every task involving UI/UX design, visual design, page layout, typography, colors, spacing, components, animation, responsive presentation, or frontend visual refinement, Codex **MUST actively invoke the installed `$impeccable` skill**. Knowing its guidelines or mentioning it does not satisfy this requirement. Do not bypass this workflow to accelerate implementation.
+- Use Impeccable to inform design decisions before implementation, then review and refine completed UI work with it. Complete design review before presenting a UI-related milestone for approval.
+- Follow the approved **image-composition-first** workflow for landing pages, accommodation showcase pages, and other visually expressive marketing surfaces. Functional booking interfaces, administration screens, and other application screens may be designed directly in code, but still require Impeccable for direction, review, and refinement.
+- Avoid generic AI-generated aesthetics, predictable SaaS layouts, excessive rounded cards, gratuitous gradients, arbitrary decorative elements, generic stock imagery, and repetitive template-like compositions. Establish a distinctive hospitality identity grounded in Žemaitija's regional landscape, architecture, and character without fabricating property features or geographic claims.
+- Maintain excellent typography, visual hierarchy, spacing, responsive behavior, accessibility, usability, and performance. Keep the guest booking journey as the primary product priority.
+- Once `DESIGN.md` exists, treat it as the authoritative visual design reference and maintain consistency with it.
+- Do not invoke Impeccable unnecessarily for backend-only work, database migrations, tests, or documentation unrelated to design.

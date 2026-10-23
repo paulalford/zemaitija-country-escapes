@@ -1,0 +1,3 @@
+
+# Preserve upstream Impeccable reference formatting.
+.agents/skills/impeccable/** whitespace=-trailing-space,-blank-at-eof
