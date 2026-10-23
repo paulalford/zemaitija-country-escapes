@@ -36,6 +36,13 @@
       "when": 1792764137058,
       "tag": "0004_refund_obligation_fk",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792766194812,
+      "tag": "0005_active_tariff_guard",
+      "breakpoints": true
     }
   ]
 }

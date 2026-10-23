@@ -14,7 +14,8 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:check": "drizzle-kit check"
+    "db:check": "drizzle-kit check",
+    "db:seed:dev": "node scripts/seed-reference.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.4",
