@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { Pool } from 'pg';
+import { Pool, type PoolClient } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { planned, seed } from '../scripts/seed-reference.mjs';
-import { quoteStay, QuoteError } from '../src/server/quote';
+import { quoteInTransaction, quoteStay, QuoteError } from '../src/server/quote';
 import { addCalendarDays, countNights, provisionalDayClass, quoteDeadlines, splitPayment, MAX_EUR_CENTS, addCents } from '../src/server/quote-math';
 
 if (existsSync('.env.local')) process.loadEnvFile('.env.local');
@@ -23,6 +23,10 @@ describe('quote calendar and money functions', () => {
     expect(['2027-07-02','2027-07-03','2027-07-04','2027-07-05'].map(provisionalDayClass)).toEqual(['WEEKEND','WEEKEND','WEEKDAY','WEEKDAY']);
     expect(countNights(input(0,'2027-12-31','2028-01-01'))).toBe(1);
     expect(addCalendarDays('2027-12-31',1)).toBe('2028-01-01');
+  });
+  it('keeps the provisional calendar processing bound at 366 nights', () => {
+    expect(countNights(input(0,'2027-01-01',addCalendarDays('2027-01-01',366)))).toBe(366);
+    expect(() => countNights(input(0,'2027-01-01',addCalendarDays('2027-01-01',367)))).toThrow(RangeError);
   });
   it('keeps years 0001–0099 literal and rejects four-digit calendar overflow', () => {
     expect(addCalendarDays('0099-12-31', 1)).toBe('0100-01-01');
@@ -52,6 +56,20 @@ describe('quote calendar and money functions', () => {
 });
 
 describe('real PostgreSQL quote preview', () => {
+  it('returns coded invalid input for 367 nights while 366 reaches rate validation', async () => {
+    const arrival='2027-01-01';
+    const atLimit=input(0,arrival,addCalendarDays(arrival,366));
+    const overLimit=input(0,arrival,addCalendarDays(arrival,367));
+    await expect(quoteStay(pool,atLimit,beforeD)).rejects.toMatchObject({code:'RATE_COVERAGE'});
+    await expect(quoteStay(pool,overLimit,beforeD)).rejects.toMatchObject({code:'INVALID_INPUT'});
+    const client=await pool.connect();
+    try {
+      await expect(quoteInTransaction(client,overLimit,beforeD)).rejects.toMatchObject({code:'INVALID_INPUT'});
+    } finally { client.release(); }
+    const unexpected=new RangeError('unexpected query failure');
+    const failingClient={query: async () => { throw unexpected; }} as unknown as PoolClient;
+    await expect(quoteInTransaction(failingClient,input(),beforeD)).rejects.toBe(unexpected);
+  });
   it('prices each fictional unit from its active version with itemized provenance', async () => {
     for (const [index, expected] of [54000n,63000n,86000n].entries()) {
       const quote = await quoteStay(pool,input(index),beforeD);

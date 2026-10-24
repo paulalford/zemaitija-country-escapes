@@ -1,6 +1,6 @@
 import type { Pool, PoolClient } from 'pg';
 import { validStay, type AvailabilityInput } from './availability';
-import { addCalendarDays, addCents, assertCents, countNights, multiplyCents, provisionalDayClass, quoteDeadlines, splitPayment, type DayClass } from './quote-math';
+import { addCalendarDays, addCents, assertCents, countNights, multiplyCents, provisionalDayClass, quoteDeadlines, splitPayment, StayProcessingLimitError, type DayClass } from './quote-math';
 
 export class QuoteError extends Error {
   constructor(public readonly code: 'INVALID_INPUT' | 'UNIT_UNAVAILABLE' | 'CAPACITY_EXCEEDED' | 'NO_ACTIVE_TARIFF' | 'RATE_COVERAGE' | 'INVALID_RATE', message = code) { super(message); }
@@ -31,7 +31,12 @@ export async function quoteStay(pool: Pool, input: AvailabilityInput, evaluation
 /** Shared pricing within a caller-owned transaction. The caller owns locking and commit. */
 export async function quoteInTransaction(client: PoolClient, input: AvailabilityInput, evaluationInstant: Date): Promise<QuotePreview> {
     if (!validStay(input) || !Number.isFinite(evaluationInstant.getTime())) throw new QuoteError('INVALID_INPUT');
-    const nights = countNights(input);
+    let nights: number;
+    try { nights = countNights(input); }
+    catch (error) {
+      if (error instanceof StayProcessingLimitError) throw new QuoteError('INVALID_INPUT');
+      throw error;
+    }
     const unitResult = await client.query<{ enabled: boolean; capacity: number; config_version: number }>('SELECT enabled,capacity,config_version FROM accommodation_units WHERE id=$1', [input.unitId]);
     const unit = unitResult.rows[0];
     if (!unit || !unit.enabled) throw new QuoteError('UNIT_UNAVAILABLE');

@@ -1,6 +1,7 @@
 import { validStay, type AvailabilityInput } from './availability';
 
 export const MAX_EUR_CENTS = 9_223_372_036_854_775_807n;
+export class StayProcessingLimitError extends RangeError {}
 export type DayClass = 'WEEKDAY' | 'WEEKEND';
 export type Split = { basis: 'ADVANCE' | 'FULL'; initialCents: bigint; balanceCents: bigint };
 
@@ -72,7 +73,7 @@ export function countNights(input: AvailabilityInput): number {
   if (!validStay(input)) throw new RangeError('Invalid stay');
   let date = input.arrivalDate, count = 0;
   while (date < input.departureDate) {
-    if (++count > 366) throw new RangeError('Stay exceeds provisional quote limit');
+    if (++count > 366) throw new StayProcessingLimitError('Stay exceeds provisional quote limit');
     date = addCalendarDays(date, 1);
   }
   return count;
