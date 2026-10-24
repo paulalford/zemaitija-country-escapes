@@ -40,3 +40,7 @@ Read the relevant repository specifications before changing code. Keep work stri
 - Maintain excellent typography, visual hierarchy, spacing, responsive behavior, accessibility, usability, and performance. Keep the guest booking journey as the primary product priority.
 - Once `DESIGN.md` exists, treat it as the authoritative visual design reference and maintain consistency with it.
 - Do not invoke Impeccable unnecessarily for backend-only work, database migrations, tests, or documentation unrelated to design.
+
+## Owner/operator accommodation management
+
+For authenticated owner accommodation calendar, private/family-use inventory blocks, maintenance closures and authorized release/replacement, read `docs/ACCOMMODATION_MANAGEMENT_SPEC.md` together with the booking, inventory and security contracts. Milestone 9 must preserve the common inventory exclusion constraint; implement owner controls in Milestone 14, LT/EN/DE localization in Milestone 15, and security/concurrency acceptance tests in Milestone 19. Do not implement the administration UI prematurely.

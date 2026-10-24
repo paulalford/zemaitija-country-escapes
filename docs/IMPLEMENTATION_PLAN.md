@@ -37,3 +37,7 @@ For each milestone:
 6. Record decisions and update documentation when implementations differ.
 
 Do not call a stage complete because the UI looks correct. Database, money, state and notification contracts are first-class.
+
+## Milestone 14 clarification — Owner accommodation management
+
+The authenticated **Accommodation / Availability Calendar** and owner block operations are in scope for Milestone 14. Follow [Accommodation Management — Owner Calendar and Inventory Blocks](ACCOMMODATION_MANAGEMENT_SPEC.md), including `PRIVATE_USE` (family/friends), `MAINTENANCE`, and `OTHER`; audited create/release/replacement; roles and server authorization; and PostgreSQL concurrency/negative tests AM01–AM18. The same `inventory_claims` exclusion domain protects guest holds, bookings and operator blocks. Milestone 9 preserves this inventory boundary but must not implement the owner UI. Milestone 15 localizes it; Milestone 19 tests end-to-end security and races. No new commercial booking type, payment or second calendar authority is permitted.
