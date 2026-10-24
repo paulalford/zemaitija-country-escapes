@@ -1,4 +1,4 @@
-import type { Pool } from 'pg';
+import type { Pool, PoolClient } from 'pg';
 import { validStay, type AvailabilityInput } from './availability';
 import { addCalendarDays, addCents, assertCents, countNights, multiplyCents, provisionalDayClass, quoteDeadlines, splitPayment, type DayClass } from './quote-math';
 
@@ -18,10 +18,20 @@ export type QuotePreview = {
 export async function quoteStay(pool: Pool, input: AvailabilityInput, evaluationInstant: Date = new Date()): Promise<QuotePreview> {
   if (!validStay(input)) throw new QuoteError('INVALID_INPUT');
   if (!Number.isFinite(evaluationInstant.getTime())) throw new QuoteError('INVALID_INPUT');
-  const nights = countNights(input);
   const client = await pool.connect();
   try {
     await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    const quote = await quoteInTransaction(client, input, evaluationInstant);
+    await client.query('COMMIT');
+    return quote;
+  } catch (error) { await client.query('ROLLBACK').catch(() => {}); throw error; }
+  finally { client.release(); }
+}
+
+/** Shared pricing within a caller-owned transaction. The caller owns locking and commit. */
+export async function quoteInTransaction(client: PoolClient, input: AvailabilityInput, evaluationInstant: Date): Promise<QuotePreview> {
+    if (!validStay(input) || !Number.isFinite(evaluationInstant.getTime())) throw new QuoteError('INVALID_INPUT');
+    const nights = countNights(input);
     const unitResult = await client.query<{ enabled: boolean; capacity: number; config_version: number }>('SELECT enabled,capacity,config_version FROM accommodation_units WHERE id=$1', [input.unitId]);
     const unit = unitResult.rows[0];
     if (!unit || !unit.enabled) throw new QuoteError('UNIT_UNAVAILABLE');
@@ -46,12 +56,9 @@ export async function quoteStay(pool: Pool, input: AvailabilityInput, evaluation
       lines.push({ kind: 'NIGHT', localNight, dayClass, rateId: rate.id, scheduleId: schedule.id, unitCents, quantity: 1, amountCents: unitCents });
     }
     if (lines.reduce((sum, line) => addCents(sum, line.amountCents), 0n) !== total) throw new QuoteError('INVALID_RATE');
-    await client.query('COMMIT');
     const deadlines = quoteDeadlines(input.arrivalDate);
     return { unitId: input.unitId, unitConfigVersion: unit.config_version, scheduleId: schedule.id, scheduleVersion: schedule.version_no,
       arrivalDate: input.arrivalDate, departureDate: input.departureDate, guestCount: input.guestCount, currency: 'EUR', lines,
       accommodationSubtotalCents: total, totalCents: total, previewSplit: splitPayment(total, evaluationInstant, deadlines.balance), deadlines,
       evaluatedAt: new Date(evaluationInstant), provisional: true };
-  } catch (error) { await client.query('ROLLBACK').catch(() => {}); throw error; }
-  finally { client.release(); }
 }

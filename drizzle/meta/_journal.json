@@ -43,6 +43,83 @@
       "when": 1792766194812,
       "tag": "0005_active_tariff_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792830623526,
+      "tag": "0006_pending_booking_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792830716527,
+      "tag": "0007_pending_guard_repairs",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792830744183,
+      "tag": "0008_hold_transition_compatibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792830816512,
+      "tag": "0009_accepted_write_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792830891987,
+      "tag": "0010_acceptance_role_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792830963930,
+      "tag": "0011_acceptance_lock_capability",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792831078103,
+      "tag": "0012_pending_state_consistency",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792831176240,
+      "tag": "0013_restrict_pending_role_updates",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792868583947,
+      "tag": "0014_accepted_pending_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792868918707,
+      "tag": "0015_predispatch_command_state_fence",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792868990903,
+      "tag": "0016_accepted_command_history",
+      "breakpoints": true
     }
   ]
 }
