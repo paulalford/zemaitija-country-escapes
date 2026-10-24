@@ -120,6 +120,27 @@
       "when": 1792868990903,
       "tag": "0016_accepted_command_history",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792871009015,
+      "tag": "0017_stripe_initial_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792871013481,
+      "tag": "0018_stripe_initial_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792873037547,
+      "tag": "0019_webhook_recovery_inbox",
+      "breakpoints": true
     }
   ]
 }

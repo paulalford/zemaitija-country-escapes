@@ -25,6 +25,7 @@ export const payment_attempts = pgTable("payment_attempts", {
   expected_cents: bigint("expected_cents", { mode: "bigint" }).notNull(),
   currency: char("currency", { length: 3 }).notNull(),
   stripe_session_id: text("stripe_session_id"),
+  checkout_url: text("checkout_url"),
   stripe_payment_intent_id: text("stripe_payment_intent_id"),
   session_created_at: timestamp("session_created_at", { withTimezone: true }),
   session_expires_at: timestamp("session_expires_at", { withTimezone: true }),

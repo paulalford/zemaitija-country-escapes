@@ -32,6 +32,7 @@ export const provider_commands = pgTable("provider_commands", {
   logical_key: text("logical_key").notNull(),
   stripe_idempotency_key: text("stripe_idempotency_key").notNull(),
   request_fingerprint: bytea("request_fingerprint").notNull(),
+  request_params: jsonb("request_params"),
   first_submitted_at: timestamp("first_submitted_at", { withTimezone: true }),
   provider_request_id: text("provider_request_id"),
   state: text("state").notNull(),
@@ -58,6 +59,12 @@ export const stripe_webhook_events = pgTable("stripe_webhook_events", {
   processing_state: text("processing_state").notNull(),
   processed_at: timestamp("processed_at", { withTimezone: true }),
   delivery_count: integer("delivery_count").notNull(),
+  processing_attempts: integer("processing_attempts").notNull().default(0),
+  next_attempt_at: timestamp("next_attempt_at", { withTimezone: true }),
+  lease_owner: text("lease_owner"),
+  lease_until: timestamp("lease_until", { withTimezone: true }),
+  last_error_code: text("last_error_code"),
+  last_error_at: timestamp("last_error_at", { withTimezone: true }),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
