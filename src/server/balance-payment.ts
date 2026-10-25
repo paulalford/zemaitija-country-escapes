@@ -263,9 +263,10 @@ export async function reconcileBalanceAttempt(pool:Pool,gateway:StripeGateway,at
           VALUES($1,'LATE_BALANCE_CAPTURE',$2,$3,$4,$5,'EUR','OPEN',clock_timestamp())`,
           [incidentId,p.id,s.id,options.webhookEventId??null,c.expectedCents.toString()]);
         await client.query(`INSERT INTO payment_records(id,provider_incident_id,stripe_payment_intent_id,stripe_charge_id,
-          captured_cents,currency,verified_at,allocation_state,reconciliation_id)
-          VALUES($1,$2,$3,$4,$5,'EUR',clock_timestamp(),'UNALLOCATABLE',$6)`,
-          [paymentId,incidentId,p.id,p.chargeId,c.expectedCents.toString(),rec]);
+          captured_cents,currency,verified_at,allocation_state,reconciliation_id,provider_succeeded_at)
+          VALUES($1,$2,$3,$4,$5,'EUR',clock_timestamp(),'UNALLOCATABLE',$6,
+            CASE WHEN $7::bigint IS NULL THEN NULL ELSE to_timestamp($7) END)`,
+          [paymentId,incidentId,p.id,p.chargeId,c.expectedCents.toString(),rec,successAt]);
         await client.query(`INSERT INTO refund_obligations(id,provider_incident_id,source_payment_record_id,reason,
           amount_cents,business_key,currency) VALUES($1,$2,$3,'UNALLOCATABLE_BALANCE_CAPTURE',$4,$5,'EUR')`,
           [randomUUID(),incidentId,paymentId,c.expectedCents.toString(),`unallocatable:${p.id}`]);

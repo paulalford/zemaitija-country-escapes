@@ -155,6 +155,34 @@
       "when": 1792925386967,
       "tag": "0021_balance_attempt_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792925386968,
+      "tag": "0022_nonpayment_jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792925386969,
+      "tag": "0023_nonpayment_release_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792925386970,
+      "tag": "0024_nonpayment_financial_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792925386971,
+      "tag": "0025_nonpayment_late_capture",
+      "breakpoints": true
     }
   ]
 }
