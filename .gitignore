@@ -28,6 +28,7 @@
 /node_modules/
 /.next/
 /coverage/
+/.local/stripe-smoke/
 *.tsbuildinfo
 .env
 .env.*

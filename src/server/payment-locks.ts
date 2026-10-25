@@ -30,7 +30,8 @@ export async function withInitialLock<T>(pool: Pool, attemptId: string,
     await client.query('SELECT id FROM bookings WHERE id=$1 FOR UPDATE',[booking_id]);
     await client.query('SELECT id FROM inventory_holds WHERE id=$1 FOR UPDATE',[hold_id]);
     await client.query('SELECT id FROM inventory_claims WHERE hold_id=$1 OR origin_hold_id=$1 FOR UPDATE',[hold_id]);
-    await client.query('SELECT id FROM payment_obligations WHERE booking_id=$1 ORDER BY id FOR UPDATE',[booking_id]);
+    // Accepted obligations are inserted with the booking and cannot be edited by the runtime role.
+    // The booking lock serializes initial-attempt transitions; allocation writers retain their own parent locks.
     await client.query('SELECT id FROM payment_attempts WHERE id=$1 FOR UPDATE',[attemptId]);
     await client.query("SELECT id FROM provider_commands WHERE payment_attempt_id=$1 AND kind='SESSION_CREATE' FOR UPDATE",[attemptId]);
     const result=await client.query<{

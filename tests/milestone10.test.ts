@@ -7,6 +7,7 @@ import { planned, seed } from '../scripts/seed-reference.mjs';
 import { quoteStay } from '../src/server/quote';
 import { acceptBooking } from '../src/server/booking-acceptance';
 import { dispatchSessionCreate } from '../src/server/checkout-worker';
+import { withInitialLock } from '../src/server/payment-locks';
 import { reconcileInitialAttempt } from '../src/server/payment-reconciliation';
 import { ingestStripeWebhook, processWebhookInbox, WebhookInputError } from '../src/server/stripe-webhooks';
 import { StripeSdkGateway, type CheckoutRequest, type CheckoutSession, type PaymentEvidence, type StripeGateway } from '../src/server/stripe-adapter';
@@ -102,6 +103,85 @@ async function signedEvent(type:string,objectType:string,objectId:string) {
 }
 
 describe('Milestone 10 Stripe test-mode initial payment',()=>{
+  it('locks an accepted initial attempt as the restricted role without obligation UPDATE or a provider call',async()=>{
+    const {accepted}=await fixture();
+    const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:2});
+    try {
+      const grants=await runtime.query(`SELECT current_user role,
+        has_table_privilege(current_user,'payment_obligations','UPDATE') table_update,
+        has_any_column_privilege(current_user,'payment_obligations','UPDATE') column_update`);
+      expect(grants.rows[0]).toMatchObject({role:'zemaitija_app',table_update:false,column_update:false});
+      let entered!:()=>void, release!:()=>void;
+      const inside=new Promise<void>(resolve=>{entered=resolve;});
+      const gate=new Promise<void>(resolve=>{release=resolve;});
+      const operation=withInitialLock(runtime,accepted.attemptId,async (_client,context)=>{
+        entered();
+        await gate;
+        return context;
+      });
+      await inside;
+      try {
+        await expect(runtime.query('SELECT id FROM bookings WHERE id=$1 FOR UPDATE NOWAIT',[accepted.bookingId]))
+          .rejects.toMatchObject({code:'55P03'});
+      } finally { release(); }
+      const context=await operation;
+      expect(context).toMatchObject({bookingId:accepted.bookingId,attemptId:accepted.attemptId,
+        obligationId:expect.any(String),commandState:'PENDING'});
+      const command=await runtime.query('SELECT first_submitted_at,request_params,attempt_count FROM provider_commands WHERE id=$1',[accepted.commandId]);
+      expect(command.rows[0]).toMatchObject({first_submitted_at:null,request_params:null,attempt_count:0});
+    } finally { await runtime.end(); }
+  });
+  it('allocates as the restricted role while retaining parent locks and budget rejection',async()=>{
+    const {unit,guest}=await fixture();
+    const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:1});
+    const client=await runtime.connect();
+    try {
+      await client.query('BEGIN');
+      const bookingId=randomUUID(),obligationId=randomUUID();
+      await client.query(`INSERT INTO bookings(id,guest_id,unit_id,arrival_date,departure_date,guest_count,status,version,
+        accepted_at,check_in_local_time,property_zone,scheduled_arrival_at,warning_at,balance_due_at,grace_ends_at)
+        VALUES($1,$2,$3,'2028-01-10','2028-01-11',1,'AWAITING_INITIAL_PAYMENT',1,clock_timestamp(),'15:00',
+        'Europe/Vilnius',clock_timestamp(),clock_timestamp(),clock_timestamp(),clock_timestamp())`,[bookingId,guest,unit]);
+      await client.query("INSERT INTO payment_obligations(id,booking_id,kind,amount_cents,due_at,currency) VALUES($1,$2,'INITIAL',100,clock_timestamp(),'EUR')",[obligationId,bookingId]);
+      const records:string[]=[];
+      for(let i=0;i<2;i++) {
+        const attemptId=randomUUID(),reconciliationId=randomUUID(),recordId=randomUUID();
+        await client.query("INSERT INTO payment_attempts(id,booking_id,obligation_id,state,expected_cents,currency,version) VALUES($1,$2,$3,'SUCCEEDED',100,'EUR',1)",[attemptId,bookingId,obligationId]);
+        await client.query("INSERT INTO reconciliation_records(id,payment_attempt_id,checked_at,provider_state,evidence_kind,result) VALUES($1,$2,clock_timestamp(),'succeeded','SYNTHETIC_TEST','VERIFIED')",[reconciliationId,attemptId]);
+        await client.query(`INSERT INTO payment_records(id,attempt_id,booking_id,obligation_id,stripe_payment_intent_id,
+          captured_cents,currency,verified_at,allocation_state,reconciliation_id)
+          VALUES($1,$2,$3,$4,$5,100,'EUR',clock_timestamp(),'ALLOCATED',$6)`,
+          [recordId,attemptId,bookingId,obligationId,`pi_test_${recordId}`,reconciliationId]);
+        records.push(recordId);
+      }
+      await client.query('INSERT INTO payment_allocations(id,payment_record_id,obligation_id,amount_cents) VALUES($1,$2,$3,60)',[randomUUID(),records[0],obligationId]);
+      await client.query('SET CONSTRAINTS payment_allocations_budget IMMEDIATE');
+      await client.query('SAVEPOINT over_budget');
+      await expect(client.query('INSERT INTO payment_allocations(id,payment_record_id,obligation_id,amount_cents) VALUES($1,$2,$3,50)',[randomUUID(),records[1],obligationId]))
+        .rejects.toMatchObject({code:'23514'});
+      await client.query('ROLLBACK TO SAVEPOINT over_budget');
+      const allocations=await client.query<{count:number}>('SELECT count(*)::int count FROM payment_allocations WHERE obligation_id=$1',[obligationId]);
+      expect(allocations.rows[0].count).toBe(1);
+    } finally { await client.query('ROLLBACK').catch(()=>{}); client.release(); await runtime.end(); }
+  });
+  it('confirms a synthetic initial capture through the restricted role without Stripe',async()=>{
+    const {accepted}=await fixture(),provider=new FakeGateway();
+    const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:3});
+    try {
+      expect((await dispatchSessionCreate(runtime,provider,accepted.attemptId,'worker-m10-runtime',urls)).status).toBe('READY');
+      provider.pay();
+      expect(await reconcileInitialAttempt(runtime,provider,accepted.attemptId)).toBe('CONFIRMED');
+      expect(await reconcileInitialAttempt(runtime,provider,accepted.attemptId)).toBe('ALREADY_RECORDED');
+      const state=await runtime.query(`SELECT b.status booking_state,h.state hold_state,c.booking_id claim_owner,
+        (SELECT count(*)::int FROM payment_records p WHERE p.attempt_id=a.id) payments,
+        (SELECT count(*)::int FROM payment_allocations x WHERE x.obligation_id=a.obligation_id) allocations
+        FROM bookings b JOIN inventory_holds h ON h.booking_id=b.id
+        JOIN payment_attempts a ON a.id=h.payment_attempt_id
+        JOIN inventory_claims c ON c.origin_hold_id=h.id WHERE b.id=$1`,[accepted.bookingId]);
+      expect(state.rows[0]).toMatchObject({booking_state:'CONFIRMED',hold_state:'CONSUMED',
+        claim_owner:accepted.bookingId,payments:1,allocations:1});
+    } finally { await runtime.end(); }
+  });
   it('persists card-only exact request and confirms one advance credit under concurrent replay',async()=>{
     const {accepted}=await fixture(),provider=new FakeGateway();
     const dispatched=await dispatchSessionCreate(pool,provider,accepted.attemptId,'worker-m10-01',urls);
