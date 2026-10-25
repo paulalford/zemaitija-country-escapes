@@ -4,11 +4,13 @@ import type { Pool } from 'pg';
 import { z } from 'zod';
 import { withInitialLock } from './payment-locks';
 import type { CheckoutRequest, CheckoutSession, StripeGateway } from './stripe-adapter';
+import { dispatchBalanceSessionCreate } from './balance-payment';
 
 const requestSchema=z.object({
   correlation:z.object({bookingId:z.uuid(),holdId:z.uuid(),attemptId:z.uuid(),commandId:z.uuid()}),
   amountCents:z.number().int().positive().safe(),expiresAt:z.number().int().positive(),
   successUrl:z.url(),cancelUrl:z.url(),idempotencyKey:z.string().min(1),
+  paymentPurpose:z.enum(['INITIAL_ADVANCE','INITIAL_FULL']).optional(),
 });
 type Lease={request:CheckoutRequest;generation:bigint;attemptId:string;commandId:string};
 export type CheckoutDispatch = {status:'READY';url:string;sessionId:string} | {status:'PENDING'|'QUARANTINED'};
@@ -48,12 +50,14 @@ export async function dispatchSessionCreate(pool: Pool, gateway: StripeGateway, 
       return {status:'QUARANTINED'};
     }
     const fresh:CheckoutRequest={correlation:{bookingId:c.bookingId,holdId:c.holdId,attemptId:c.attemptId,commandId:c.commandId},
+      paymentPurpose:c.splitBasis==='ADVANCE'?'INITIAL_ADVANCE':'INITIAL_FULL',
       amountCents:Number(c.expectedCents),expiresAt:Math.floor(Date.now()/1000)+1830,
       successUrl:urls.successUrl,cancelUrl:urls.cancelUrl,idempotencyKey:c.idempotencyKey};
     if (!Number.isSafeInteger(fresh.amountCents) || fresh.amountCents<=0) throw new Error('Stripe amount outside safe integer range');
     const request=requestSchema.parse(c.requestParams ?? fresh);
     if (request.correlation.attemptId!==c.attemptId || request.correlation.commandId!==c.commandId ||
-        request.amountCents!==fresh.amountCents || request.idempotencyKey!==c.idempotencyKey) throw new Error('Persisted Checkout request mismatch');
+        request.amountCents!==fresh.amountCents || request.idempotencyKey!==c.idempotencyKey ||
+        request.paymentPurpose!==undefined && request.paymentPurpose!==fresh.paymentPurpose) throw new Error('Persisted Checkout request mismatch');
     const generation=c.leaseGeneration+1n;
     await client.query(`UPDATE provider_commands SET request_params=COALESCE(request_params,$2::jsonb),
       first_submitted_at=COALESCE(first_submitted_at,clock_timestamp()),state='SUBMITTED',
@@ -105,6 +109,11 @@ export async function dispatchDueSessionCommands(pool:Pool,gateway:StripeGateway
       AND (lease_expires_at IS NULL OR lease_expires_at<clock_timestamp())
     ORDER BY created_at LIMIT $1`,[limit]);
   const results:CheckoutDispatch[]=[];
-  for (const row of ids.rows) results.push(await dispatchSessionCreate(pool,gateway,row.payment_attempt_id,workerId,urls));
+  for (const row of ids.rows) {
+    const attempt=await pool.query<{hold_id:string|null}>('SELECT hold_id FROM payment_attempts WHERE id=$1',[row.payment_attempt_id]);
+    results.push(attempt.rows[0]?.hold_id
+      ? await dispatchSessionCreate(pool,gateway,row.payment_attempt_id,workerId,urls)
+      : await dispatchBalanceSessionCreate(pool,gateway,row.payment_attempt_id,workerId,urls));
+  }
   return results;
 }

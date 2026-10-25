@@ -3,6 +3,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
 import type { StripeGateway, VerifiedEvent } from './stripe-adapter';
 import { reconcileInitialAttempt } from './payment-reconciliation';
+import { reconcileBalanceAttempt } from './balance-payment';
 
 const relevant=new Set(['checkout.session.completed','checkout.session.expired',
   'payment_intent.succeeded','payment_intent.payment_failed','payment_intent.canceled']);
@@ -78,7 +79,9 @@ export async function processWebhookInbox(pool:Pool,gateway:StripeGateway,limit=
         }
       }
       if (attemptId) {
-        const result=await reconcileInitialAttempt(pool,gateway,attemptId,{webhookEventId:event.id,
+        const attempt=await pool.query<{hold_id:string|null}>('SELECT hold_id FROM payment_attempts WHERE id=$1',[attemptId]);
+        const reconcile=attempt.rows[0]?.hold_id?reconcileInitialAttempt:reconcileBalanceAttempt;
+        const result=await reconcile(pool,gateway,attemptId,{webhookEventId:event.id,
           sessionLocator:event.object_type==='checkout.session'?event.object_id:undefined,
           paymentIntentLocator:event.object_type==='payment_intent'?event.object_id:undefined});
         if (result!=='RECONCILING') outcome='PROCESSED';

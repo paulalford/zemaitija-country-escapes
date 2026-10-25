@@ -148,6 +148,13 @@
       "when": 1792925386966,
       "tag": "0020_allocation_parent_lock_privilege",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792925386967,
+      "tag": "0021_balance_attempt_guards",
+      "breakpoints": true
     }
   ]
 }

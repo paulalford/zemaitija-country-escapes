@@ -3,6 +3,7 @@ import type { Pool, PoolClient } from 'pg';
 
 export type InitialContext = {
   bookingId: string; guestId: string; unitId: string; status: string; locale: string;
+  splitBasis: 'ADVANCE' | 'FULL';
   holdId: string; holdState: string; claimId: string; claimHoldId: string | null;
   claimBookingId: string | null; claimReleasedAt: Date | null;
   attemptId: string; attemptState: string; expectedCents: bigint; obligationId: string;
@@ -35,13 +36,13 @@ export async function withInitialLock<T>(pool: Pool, attemptId: string,
     await client.query('SELECT id FROM payment_attempts WHERE id=$1 FOR UPDATE',[attemptId]);
     await client.query("SELECT id FROM provider_commands WHERE payment_attempt_id=$1 AND kind='SESSION_CREATE' FOR UPDATE",[attemptId]);
     const result=await client.query<{
-      booking_id:string;guest_id:string;unit_id:string;status:string;locale:string;
+      booking_id:string;guest_id:string;unit_id:string;status:string;locale:string;split_basis:'ADVANCE'|'FULL';
       hold_id:string;hold_state:string;claim_id:string;claim_hold_id:string|null;claim_booking_id:string|null;claim_released_at:Date|null;
       attempt_id:string;attempt_state:string;expected_cents:string;obligation_id:string;
       session_id:string|null;checkout_url:string|null;session_expires_at:Date|null;payment_intent_id:string|null;
       command_id:string;command_state:string;idempotency_key:string;request_fingerprint:Buffer;request_params:unknown;
       first_submitted_at:Date|null;lease_generation:string;lease_owner:string|null;lease_expires_at:Date|null;
-    }>(`SELECT b.id booking_id,b.guest_id,b.unit_id,b.status,s.locale,h.id hold_id,h.state hold_state,
+    }>(`SELECT b.id booking_id,b.guest_id,b.unit_id,b.status,s.locale,s.split_basis,h.id hold_id,h.state hold_state,
       c.id claim_id,c.hold_id claim_hold_id,c.booking_id claim_booking_id,c.released_at claim_released_at,
       a.id attempt_id,a.state attempt_state,a.expected_cents::text,a.obligation_id,
       a.stripe_session_id session_id,a.checkout_url,a.session_expires_at,a.stripe_payment_intent_id payment_intent_id,
@@ -55,7 +56,7 @@ export async function withInitialLock<T>(pool: Pool, attemptId: string,
       WHERE a.id=$1`,[attemptId]);
     const r=result.rows[0];
     if (!r) throw new Error('Incomplete accepted initial attempt');
-    const context:InitialContext={bookingId:r.booking_id,guestId:r.guest_id,unitId:r.unit_id,status:r.status,locale:r.locale,
+    const context:InitialContext={bookingId:r.booking_id,guestId:r.guest_id,unitId:r.unit_id,status:r.status,locale:r.locale,splitBasis:r.split_basis,
       holdId:r.hold_id,holdState:r.hold_state,claimId:r.claim_id,claimHoldId:r.claim_hold_id,
       claimBookingId:r.claim_booking_id,claimReleasedAt:r.claim_released_at,attemptId:r.attempt_id,
       attemptState:r.attempt_state,expectedCents:BigInt(r.expected_cents),obligationId:r.obligation_id,

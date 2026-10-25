@@ -22,8 +22,13 @@ export function stripeConfig(env: NodeJS.ProcessEnv = process.env): StripeConfig
   return config;
 }
 
-export type Correlation = { bookingId: string; holdId: string; attemptId: string; commandId: string };
-export type CheckoutRequest = { correlation: Correlation; amountCents: number; expiresAt: number; successUrl: string; cancelUrl: string; idempotencyKey: string };
+export type Correlation = { bookingId: string; holdId?: string; attemptId: string; commandId: string };
+export type CheckoutPaymentPurpose = 'INITIAL_ADVANCE' | 'INITIAL_FULL' | 'BALANCE';
+export type CheckoutRequest = {
+  correlation: Correlation; amountCents: number; expiresAt: number; successUrl: string; cancelUrl: string; idempotencyKey: string;
+  /** Absent only on legacy durable requests: preserve their original Stripe parameters on replay. */
+  paymentPurpose?: CheckoutPaymentPurpose;
+};
 export type CheckoutSession = {
   id: string; accountId: string; url: string | null; created: number; expiresAt: number; status: string;
   paymentStatus: string; paymentIntentId: string | null; amountTotal: number | null;
@@ -35,6 +40,8 @@ export type PaymentEvidence = {
   id: string; status: string; amountReceived: number; currency: string; livemode: boolean;
   metadata: Record<string,string>; chargeId: string | null; chargePaid: boolean;
   chargeCaptured: boolean; chargeAmount: number | null; chargeCurrency: string | null;
+  /** Stripe Charge creation instant; nullable when authoritative timing is unavailable. */
+  chargeCreated?: number | null;
 };
 export type VerifiedEvent = { id: string; type: string; created: number; livemode: boolean; accountId: string; objectType: string; objectId: string };
 export interface StripeGateway {
@@ -72,14 +79,19 @@ export class StripeSdkGateway implements StripeGateway {
   async createSession(request: CheckoutRequest): Promise<CheckoutSession> {
     await this.assertAccount();
     const c=request.correlation;
+    const descriptions:Record<CheckoutPaymentPurpose,string>={
+      INITIAL_ADVANCE:'Synthetic accommodation booking advance',
+      INITIAL_FULL:'Synthetic accommodation booking full initial payment',
+      BALANCE:'Synthetic accommodation booking balance',
+    };
     const session=await this.stripe.checkout.sessions.create({
       mode:'payment',payment_method_types:['card'],client_reference_id:c.bookingId,
       success_url:request.successUrl,cancel_url:request.cancelUrl,expires_at:request.expiresAt,
       allow_promotion_codes:false,automatic_tax:{enabled:false},
       line_items:[{price_data:{currency:'eur',unit_amount:request.amountCents,
-        product_data:{name:'Synthetic accommodation booking advance'}},quantity:1}],
-      metadata:{bookingId:c.bookingId,holdId:c.holdId,attemptId:c.attemptId,commandId:c.commandId},
-      payment_intent_data:{metadata:{bookingId:c.bookingId,holdId:c.holdId,attemptId:c.attemptId,commandId:c.commandId}},
+        product_data:{name:descriptions[request.paymentPurpose??'INITIAL_ADVANCE']}},quantity:1}],
+      metadata:{bookingId:c.bookingId,...(c.holdId?{holdId:c.holdId}:{}),attemptId:c.attemptId,commandId:c.commandId},
+      payment_intent_data:{metadata:{bookingId:c.bookingId,...(c.holdId?{holdId:c.holdId}:{}),attemptId:c.attemptId,commandId:c.commandId}},
     },{idempotencyKey:request.idempotencyKey});
     if (session.livemode) throw new Error('Live Stripe Session rejected');
     return normalizeSession(session,this.accountId);
@@ -107,7 +119,8 @@ export class StripeSdkGateway implements StripeGateway {
     return {id:intent.id,status:intent.status,amountReceived:intent.amount_received,currency:intent.currency,
       livemode:intent.livemode,metadata:intent.metadata ?? {},chargeId:charge?.id ?? null,
       chargePaid:charge?.paid === true,chargeCaptured:charge?.captured === true,
-      chargeAmount:charge?.amount ?? null,chargeCurrency:charge?.currency ?? null};
+      chargeAmount:charge?.amount ?? null,chargeCurrency:charge?.currency ?? null,
+      chargeCreated:charge?.created ?? null};
   }
   async expireSession(id: string, idempotencyKey: string): Promise<CheckoutSession> {
     await this.assertAccount();

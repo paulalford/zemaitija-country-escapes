@@ -205,6 +205,14 @@ async function recordSuccess(pool:Pool,attemptId:string,s:CheckoutSession,p:Paym
         VALUES($1,$2,$3,'BOOKING_CONFIRMED','GUEST',$4,$5,$6,clock_timestamp(),'QUEUED')
         ON CONFLICT (idempotency_key) DO NOTHING`,
         [randomUUID(),c.bookingId,auditId,c.guestId,c.locale,`booking-confirmed:${c.bookingId}`]);
+      const schedule=await client.query<{balance_cents:string}>('SELECT balance_cents::text FROM price_snapshots WHERE booking_id=$1',[c.bookingId]);
+      if (schedule.rows[0]?.balance_cents==='0') {
+        await client.query(`INSERT INTO notification_outbox(id,booking_id,source_audit_event_id,event_type,recipient_kind,
+          recipient_ref,locale,idempotency_key,due_at,state)
+          VALUES($1,$2,$3,'PAID_IN_FULL','GUEST',$4,$5,$6,clock_timestamp(),'QUEUED')
+          ON CONFLICT (idempotency_key) DO NOTHING`,
+          [randomUUID(),c.bookingId,auditId,c.guestId,c.locale,`paid-full:${paymentId}`]);
+      }
       return 'CONFIRMED';
     }
     const incidentId=randomUUID(),paymentId=randomUUID(),auditId=randomUUID();

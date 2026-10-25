@@ -29,6 +29,7 @@
 /.next/
 /coverage/
 /.local/stripe-smoke/
+/.local/stripe-balance-smoke/
 *.tsbuildinfo
 .env
 .env.*
