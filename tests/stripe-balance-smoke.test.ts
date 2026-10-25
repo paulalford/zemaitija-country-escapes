@@ -44,7 +44,7 @@ function fixture(paid=false) {
     snapshot.allocations.push({id:id(11),payment_record_id:id(10),obligation_id:id(4),amount_cents:'14000'});
   }
   const position={position:paid?'PAID_IN_FULL' as const:'BALANCE_DUE' as const,paidCents:paid?20000n:6000n,
-    outstandingCents:paid?0n:14000n,balanceDueAt:new Date('2027-03-27T13:00:00Z'),graceEndsAt:new Date('2027-03-28T13:00:00Z')};
+    outstandingCents:paid?0n:14000n,refundedCents:0n,refundDueCents:0n,additionalChargeReviewCents:0n,balanceDueAt:new Date('2027-03-27T13:00:00Z'),graceEndsAt:new Date('2027-03-28T13:00:00Z')};
   return {snapshot,state,position};
 }
 

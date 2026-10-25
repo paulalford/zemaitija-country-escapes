@@ -1,4 +1,5 @@
 import 'server-only';
+import type { RefundGateway, RefundRequest, RefundEvidence } from './refund-worker';
 import Stripe from 'stripe';
 import { z } from 'zod';
 
@@ -62,7 +63,7 @@ function normalizeSession(s: Stripe.Checkout.Session, accountId: string): Checko
     metadata:s.metadata ?? {} };
 }
 
-export class StripeSdkGateway implements StripeGateway {
+export class StripeSdkGateway implements StripeGateway, RefundGateway {
   readonly accountId: string;
   private readonly stripe: Stripe;
   private accountCheck?: Promise<void>;
@@ -128,6 +129,33 @@ export class StripeSdkGateway implements StripeGateway {
     if (session.livemode) throw new Error('Live Stripe Session rejected');
     return normalizeSession(session,this.accountId);
   }
+  private async normalizeRefund(refund:Stripe.Refund & {lastResponse?:{requestId:string}}):Promise<RefundEvidence> {
+    const chargeId=typeof refund.charge==='string'?refund.charge:refund.charge?.id??null;
+    if(!chargeId)throw new Error('Refund original charge missing');
+    const charge=await this.stripe.charges.retrieve(chargeId);
+    if(charge.livemode)throw new Error('Live refund rejected');
+    return {id:refund.id,accountId:this.accountId,livemode:charge.livemode,chargeId,
+      paymentIntentId:typeof refund.payment_intent==='string'?refund.payment_intent:refund.payment_intent?.id??null,
+      amount:refund.amount,currency:refund.currency,status:refund.status??'unknown',metadata:refund.metadata??{},failureReason:refund.failure_reason??null,
+      requestId:refund.lastResponse?.requestId};
+  }
+  async createRefund(q:RefundRequest):Promise<RefundEvidence> {
+    await this.assertAccount();
+    return this.normalizeRefund(await this.stripe.refunds.create({charge:q.chargeId,amount:q.amountCents,
+      metadata:{attemptId:q.attemptId,commandId:q.commandId,obligationId:q.obligationId,paymentRecordId:q.paymentRecordId}},
+      {idempotencyKey:q.idempotencyKey}));
+  }
+  async retrieveRefund(id:string):Promise<RefundEvidence> {
+    await this.assertAccount();
+    return this.normalizeRefund(await this.stripe.refunds.retrieve(id));
+  }
+  async listRefunds(paymentIntentId:string):Promise<RefundEvidence[]> {
+    await this.assertAccount();
+    const result:RefundEvidence[]=[];
+    for await (const refund of this.stripe.refunds.list({payment_intent:paymentIntentId,limit:100}))
+      result.push(await this.normalizeRefund(refund));
+    return result;
+  }
   verifyEvent(raw: Buffer, signature: string): VerifiedEvent {
     const event=this.stripe.webhooks.constructEvent(raw,signature,this.config.STRIPE_WEBHOOK_SECRET);
     if (event.livemode || (event.account && event.account!==this.accountId)) throw new Error('Wrong Stripe environment or account');
@@ -138,6 +166,6 @@ export class StripeSdkGateway implements StripeGateway {
   }
 }
 
-export function stripeGateway(env: NodeJS.ProcessEnv = process.env): StripeGateway {
+export function stripeGateway(env: NodeJS.ProcessEnv = process.env): StripeGateway & RefundGateway {
   return new StripeSdkGateway(stripeConfig(env));
 }

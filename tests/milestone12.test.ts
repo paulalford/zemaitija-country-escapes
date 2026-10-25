@@ -234,7 +234,7 @@ describe('Milestone 12 schedules and governed cancellation',()=>{
       has_table_privilege('zemaitija_app','notification_delivery_attempts','INSERT') attempts,
       has_table_privilege('zemaitija_app','cancellation_assessments','INSERT') assessment,
       has_table_privilege('zemaitija_app','refund_records','INSERT') refund_execution`);
-    expect(r.rows[0]).toEqual({notices:true,attempts:true,assessment:true,refund_execution:false});
+    expect(r.rows[0]).toEqual({notices:true,attempts:true,assessment:true,refund_execution:true});
   });
   it('records a capture discovered after committed cancellation once through the restricted role',async()=>{
     const {booking,gateway,unit,guest}=await fixture(),d=quoteDeadlines('2027-07-02');
@@ -356,9 +356,9 @@ describe('Milestone 12 schedules and governed cancellation',()=>{
     const before=await domainSnapshot(booking.bookingId,notice.provider_incident_id);
     const transport=new MemorySandboxTransport();
     const send=()=>deliverOneSandboxNotice(runtime,transport,now,notice.booking_id??undefined,notice.provider_incident_id??undefined);
-    expect((await Promise.all([send(),send()])).sort()).toEqual(['SENT',null].sort());
+    expect((await Promise.all([send(),send()])).sort()).toEqual((notice.booking_id?['SENT','SENT']:['SENT',null]).sort());
     expect(await send()).toBeNull();
-    expect(transport.messages.size).toBe(1);
+    expect(transport.messages.size).toBe(notice.booking_id?2:1);
     const message=transport.messages.get(notice.idempotency_key)!.message;
     expect(message).toMatchObject({key:notice.idempotency_key,recipientKind:'OPERATIONS',recipientRef:null,locale:'en'});
     expect(message.body).toContain(event==='UNALLOCATABLE_CAPTURE'?'full refund obligation':'authoritative provider evidence');

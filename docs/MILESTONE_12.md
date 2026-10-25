@@ -32,3 +32,7 @@ Milestone 13 owns the missing incident/refund communication lifecycle: create an
 ## Local verification
 
 Apply migrations to the local development database with `npm run db:migrate`; then run `npm run db:check`, `npm run typecheck`, `npm run lint`, and `npm test`. The database tests require the restricted application role and synthetic fixtures. They do not call Stripe or a real mail provider.
+
+## Milestone 13 completion note
+
+The guest incident-notification gap recorded above is addressed by Milestone 13's transactional guest update producer and bounded historical backfill. See [Milestone 13](MILESTONE_13.md) for verified-association rules, investigation of unknown recipients, pending-refund wording, refund execution and reconciliation safeguards. The nonpayment commercial-policy gate remains unchanged.

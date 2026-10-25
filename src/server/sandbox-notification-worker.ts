@@ -1,12 +1,13 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
+import { financialNoticeContent, financialNoticeEvents } from './financial-notifications';
 import { formatVilnius, noticeContent, type NoticeKind } from './nonpayment-notices';
 
 type Locale='lt'|'en'|'de';
 type Row={id:string;booking_id:string|null;provider_incident_id:string|null;recipient_ref:string|null;recipient_kind:string;locale:Locale;event_type:string;idempotency_key:string;
   balance_due_at:Date|null;grace_ends_at:Date|null;status:string|null;retention_state:string|null;attempt_no:number;
-  total_cents:string|null;outstandingCents?:bigint};
+  audit_details:Record<string,string>|null; audit_amount:string|null;total_cents:string|null;outstandingCents?:bigint};
 export type SandboxMessage={key:string;recipientKind:string;recipientRef:string|null;locale:Locale;body:string};
 export interface SandboxTransport {
   readonly sandbox:true;
@@ -25,13 +26,13 @@ export class MemorySandboxTransport implements SandboxTransport {
   }
   async lookup(key:string) {const prior=this.messages.get(key);return prior?{messageId:prior.messageId}:null;}
 }
-const operationsOnly=new Set(['UNALLOCATABLE_CAPTURE','PAYMENT_EVIDENCE_MISMATCH','DELIVERY_FAILURE']);
-const supported=new Set(['BOOKING_CONFIRMED','PAID_IN_FULL','BALANCE_WARNING','BALANCE_DUE','BALANCE_OVERDUE','CANCELLED_NONPAYMENT',...operationsOnly]);
+const operationsOnly=new Set(['UNALLOCATABLE_CAPTURE','PAYMENT_EVIDENCE_MISMATCH','DELIVERY_FAILURE','REFUND_INTERVENTION']);
+const supported=new Set(['BOOKING_CONFIRMED','PAID_IN_FULL','BALANCE_WARNING','BALANCE_DUE','BALANCE_OVERDUE','CANCELLED_NONPAYMENT',...financialNoticeEvents,...operationsOnly]);
 const retryMinutes=[1,5,30,120,720];
 const jitter=(key:string,attempt:number)=>[...key].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,attempt)%30;
 function obsolete(row:Row,now:Date,outstanding:bigint):string|null {
   if (operationsOnly.has(row.event_type)) return null;
-  if (row.event_type==='CANCELLED_NONPAYMENT') return null;
+  if (row.event_type==='CANCELLED_NONPAYMENT'||financialNoticeEvents.includes(row.event_type)) return null;
   if (row.status!=='CONFIRMED') return 'BOOKING_NOT_CONFIRMED';
   if (row.event_type==='BOOKING_CONFIRMED' || row.event_type==='PAID_IN_FULL') return null;
   if (outstanding<=0n) return 'BALANCE_PAID';
@@ -39,6 +40,7 @@ function obsolete(row:Row,now:Date,outstanding:bigint):string|null {
   return null;
 }
 function body(row:Row,now:Date):string {
+  if(financialNoticeEvents.includes(row.event_type))return financialNoticeContent(row.event_type,row.locale,row.audit_amount??row.audit_details?.amountCents??null,row.total_cents);
   const subject=row.provider_incident_id?`incident ${row.provider_incident_id}`:`booking ${row.booking_id}`;
   if (row.event_type==='UNALLOCATABLE_CAPTURE') return {
     lt:`Nepriskirtas gautas mokėjimas (${subject}). Patikrinkite mokėjimo įrodymus, visos sumos grąžinimo prievolę ir svečio informavimą. Tęskite patvirtintą grąžinimo procesą. Rezervacijos neatkurkite; grąžinimo nelaikykite įvykdytu, kol jis nepatvirtintas.`,
@@ -94,9 +96,9 @@ export async function deliverOneSandboxNotice(pool:Pool,transport:SandboxTranspo
     await client.query('BEGIN');
     await client.query("SET LOCAL lock_timeout='5s'");
     const found=await client.query<Row>(`SELECT n.id,n.booking_id,n.provider_incident_id,n.recipient_ref,n.recipient_kind,n.locale,n.event_type,n.idempotency_key,
-      b.balance_due_at,b.grace_ends_at,b.status,g.retention_state,s.total_cents::text,
+      b.balance_due_at,b.grace_ends_at,b.status,g.retention_state,s.total_cents::text,a.details audit_details,a.amount_cents::text audit_amount,
       (SELECT count(*)::int FROM notification_delivery_attempts a WHERE a.notification_id=n.id) attempt_no
-      FROM notification_outbox n LEFT JOIN bookings b ON b.id=n.booking_id
+      FROM notification_outbox n JOIN audit_events a ON a.id=n.source_audit_event_id LEFT JOIN bookings b ON b.id=n.booking_id
       LEFT JOIN price_snapshots s ON s.booking_id=b.id
       LEFT JOIN guests g ON g.id=n.recipient_ref
       WHERE n.state IN ('QUEUED','RETRY_WAIT') AND n.due_at<=$1 AND n.event_type=ANY($2::text[])

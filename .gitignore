@@ -30,6 +30,7 @@
 /coverage/
 /.local/stripe-smoke/
 /.local/stripe-balance-smoke/
+/.local/stripe-refund-smoke/
 *.tsbuildinfo
 .env
 .env.*

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, uuid, text, integer, bigint, timestamp, char, type AnyPgColumn } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, bigint, timestamp, char, jsonb, type AnyPgColumn } from "drizzle-orm/pg-core";
 import { admin_users } from "./booking";
 import { bookings } from "./booking";
 import { payment_records } from "./payments";
@@ -19,6 +19,7 @@ export const cancellation_assessments = pgTable("cancellation_assessments", {
 });
 
 export const assessment_revisions = pgTable("assessment_revisions", {
+  evidence: jsonb("evidence"),
   id: uuid("id").primaryKey().notNull(),
   assessment_id: uuid("assessment_id").references((): AnyPgColumn => cancellation_assessments.id, { onDelete: "restrict" }).notNull(),
   revision_no: integer("revision_no").notNull(),

@@ -4,9 +4,10 @@ import type { Pool } from 'pg';
 import type { StripeGateway, VerifiedEvent } from './stripe-adapter';
 import { reconcileInitialAttempt } from './payment-reconciliation';
 import { reconcileBalanceAttempt } from './balance-payment';
+import { reconcileRefund, type RefundGateway } from './refund-worker';
 
 const relevant=new Set(['checkout.session.completed','checkout.session.expired',
-  'payment_intent.succeeded','payment_intent.payment_failed','payment_intent.canceled']);
+  'payment_intent.succeeded','payment_intent.payment_failed','payment_intent.canceled','refund.created','refund.updated','refund.failed','charge.refunded']);
 const asynchronous=new Set(['checkout.session.async_payment_succeeded','checkout.session.async_payment_failed']);
 export class WebhookInputError extends Error {}
 
@@ -31,7 +32,7 @@ export async function ingestStripeWebhook(pool:Pool,gateway:StripeGateway,raw:Bu
 }
 
 /** Trusted internal invocation; webhook HTTP never performs provider reconciliation. */
-export async function processWebhookInbox(pool:Pool,gateway:StripeGateway,limit=10,onlyEventId?:string):Promise<number> {
+export async function processWebhookInbox(pool:Pool,gateway:StripeGateway & Partial<RefundGateway>,limit=10,onlyEventId?:string):Promise<number> {
   if (!Number.isSafeInteger(limit) || limit<1 || limit>25) throw new RangeError('Invalid batch size');
   const workerId=randomUUID();
   await pool.query(`UPDATE stripe_webhook_events SET processing_state='INVESTIGATE',
@@ -56,6 +57,23 @@ export async function processWebhookInbox(pool:Pool,gateway:StripeGateway,limit=
     if (!event) break;
     let outcome:'PROCESSED'|'RETRY'='RETRY',errorCode='PROCESSING_ERROR';
     try {
+      if(event.object_type==='refund'||event.object_type==='charge') {
+        if(!gateway.retrieveRefund||!gateway.listRefunds||!gateway.createRefund)throw new Error('Refund gateway missing');
+        const refunds=event.object_type==='refund'?[await gateway.retrieveRefund(event.object_id)]:
+          await (async()=>{
+            const payment=(await pool.query<{stripe_payment_intent_id:string}>('SELECT stripe_payment_intent_id FROM payment_records WHERE stripe_charge_id=$1',[event.object_id])).rows[0];
+            if(!payment)throw new Error('Original charge unknown');
+            return gateway.listRefunds!(payment.stripe_payment_intent_id);
+          })();
+        if(!refunds.length)throw new Error('Refund evidence missing');
+        for(const r of refunds) {
+          const match=(await pool.query<{id:string}>(`SELECT id FROM refund_attempts WHERE stripe_refund_id=$1 OR id::text=$2`,[r.id,r.metadata.attemptId??''])).rows;
+          if(match.length!==1)throw new Error('Refund attempt not uniquely located');
+          const state=await reconcileRefund(pool,gateway as RefundGateway,match[0].id,{refundId:r.id,webhookEventId:event.id});
+          if(!['SUCCEEDED','FAILED','PROCESSING'].includes(state))throw new Error('Refund reconciliation uncertain');
+        }
+        outcome='PROCESSED';
+      }
       let attemptId:string|null=null;
       if (event.object_type==='checkout.session') {
         const found=await pool.query<{id:string}>('SELECT id FROM payment_attempts WHERE stripe_session_id=$1',[event.object_id]);
@@ -86,7 +104,7 @@ export async function processWebhookInbox(pool:Pool,gateway:StripeGateway,limit=
           paymentIntentLocator:event.object_type==='payment_intent'?event.object_id:undefined});
         if (result!=='RECONCILING') outcome='PROCESSED';
         else errorCode='RECONCILIATION_UNCERTAIN';
-      } else errorCode='ATTEMPT_NOT_LOCATED';
+      } else if(outcome!=='PROCESSED') errorCode='ATTEMPT_NOT_LOCATED';
     } catch {
       errorCode='PROVIDER_OR_DATABASE_ERROR';
     }
