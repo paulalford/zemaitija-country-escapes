@@ -263,3 +263,9 @@ Facts pair muted terms with ink values and tabular numerals. Financial tables us
 - **Don't** invent property features, testimonials, certifications, exact geography, or live-booking claims.
 
 Evidence: shared workspace CSS; Shell, Status, Notice, and Confirm primitives; guest reservation page; operator calendar and structured assessment form; finished guest and finance desktop/mobile captures. Development overlays and synthetic fixture identifiers visible in captures are not design-system components.
+
+## Multilingual workspace additions — Milestone 15
+
+A visible language navigation row follows the demonstration band, using the existing text-link treatment and spacing. It names each language in its own language (`Lietuvių`, `English`, `Deutsch`), identifies the current language with weight and underline, and retains native keyboard links with a 44px minimum target height. The guest access screen switches language in place while its one-use token remains in memory. The existing placeholder home page receives language links without a marketing redesign.
+
+Long translations wrap in headings, controls and financial tables; grid children may shrink without widening the page. Calendar date navigation wraps independently. Editable controls use at least 16px text, including on mobile. Financial deadlines explicitly include `Europe/Vilnius` and the applicable GMT offset. The accepted contractual language and viewing language are separate labelled facts. Palette, type hierarchy, ruled sections and disclosure patterns retain the Milestone 14 direction.

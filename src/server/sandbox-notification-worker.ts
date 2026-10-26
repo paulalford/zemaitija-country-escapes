@@ -1,4 +1,5 @@
 import 'server-only';
+import { money as formatMoney } from '../i18n/format';
 import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
 import { accessLinkForNotice, GuestAccessRevoked } from './guest-management';
@@ -58,9 +59,9 @@ function body(row:Row,now:Date):string {
     en:`Payment evidence mismatch (${subject}). Locate the quarantined payment attempt in the audit trail and investigate authoritative provider evidence. Do not confirm payment from conflicting evidence; check the guest status update if guest funds are affected.`,
     de:`Widersprüchliche Zahlungsnachweise (${subject}). Suchen Sie den isolierten Zahlungsversuch im Auditprotokoll und prüfen Sie maßgebliche Anbieternachweise. Bestätigen Sie keine Zahlung anhand widersprüchlicher Daten; prüfen Sie die Gastinformation, wenn Gastgelder betroffen sind.`,
   }[row.locale];
-  if (row.event_type==='DELIVERY_FAILURE') return `Sandbox notice delivery failed for ${subject}. Investigate the outbox.`;
+  if (row.event_type==='DELIVERY_FAILURE') return {lt:`Bandomojo pranešimo pristatyti nepavyko (${subject}). Patikrinkite siuntimo eilę.`,en:`Sandbox notice delivery failed for ${subject}. Investigate the outbox.`,de:`Sandbox-Versand fehlgeschlagen (${subject}). Prüfen Sie den Postausgang.`}[row.locale];
   if (!row.booking_id || !row.balance_due_at || !row.grace_ends_at || row.total_cents===null) throw new Error('Booking notice context missing');
-  const money=(cents:bigint)=>`${new Intl.NumberFormat(row.locale).format(cents/100n)}${row.locale==='en'?'.':','}${(cents%100n).toString().padStart(2,'0')} EUR`;
+  const money=(cents:bigint)=>formatMoney(cents,row.locale,'code');
   if (row.event_type==='PAID_IN_FULL') return {
     lt:`Jūsų užsakymas visiškai apmokėtas. Patvirtinta mokėjimų suma: ${money(BigInt(row.total_cents))}.`,
     en:`Your booking is paid in full. Verified payments total ${money(BigInt(row.total_cents))}.`,

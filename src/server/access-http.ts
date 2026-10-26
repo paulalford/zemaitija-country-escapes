@@ -1,4 +1,6 @@
 import 'server-only';
+import { localePath, resolveLocale, localeCookie } from '../i18n/routing';
+import { translate } from '../i18n/messages';
 import type { Pool } from 'pg';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -45,10 +47,12 @@ const cents=z.string().regex(/^(0|[1-9]\d{0,14})$/).transform(BigInt);
 const evidence=z.object({operationKey:z.string(),expectedRevision:z.number().int().nonnegative(),chargeCents:cents,documentedLossCents:cents,avoidedCostsCents:cents,
   replacements:z.array(z.object({bookingId:uuid,arrivalDate:z.string(),departureDate:z.string(),recoveredCents:cents,provenance:z.string().min(1).max(2000)}).strict()).max(30),
   evidenceRef:z.string().min(1).max(2000),provenance:z.string().min(1).max(2000),legalConstraints:z.string().min(1).max(2000),rationale:z.string().min(1).max(2000)}).strict();
-const redirect=(path:string)=>NextResponse.redirect(new URL(path,accessConfig().origin),{status:303,headers:privateHeaders});
+const pageRedirect=(path:string)=>NextResponse.redirect(new URL(path,accessConfig().origin),{status:303,headers:privateHeaders});
 /** Explicit route dispatcher. It never deserializes InternalAuthority or provider parameters. */
 export async function accessRequest(pool:Pool,request:Request,path:string) {
   let form=false;
+  const locale=resolveLocale(request.headers.get('cookie')?.split(';').map(c=>c.trim()).find(c=>c.startsWith(`${localeCookie}=`))?.slice(localeCookie.length+1));
+  const redirect=(path:string)=>pageRedirect(localePath(locale,path));
   try {
     if(request.method==='GET'&&path==='admin/callback') {
       const raw=await finishAdminLogin(pool,new URL(request.url),cookieValue(request,'oidc'));
@@ -156,7 +160,7 @@ export async function accessRequest(pool:Pool,request:Request,path:string) {
     const denied=e instanceof AccessDenied||e instanceof AuthorizationDeniedError;
     const status=denied?404:e instanceof RateLimited?429:e instanceof ManagementConflict?409:e instanceof z.ZodError||e instanceof SyntaxError||e instanceof InvalidRequest?400:503;
     if(e instanceof AccessDenied)await recordAccessDenial(pool,e);
-    const message=status===404?'Access unavailable. Request a fresh link or sign in again.':status===429?'Please wait before trying again.':status===409?'Dates or operation already in use. Refresh the calendar and review the current state.':status===400?'Check the submitted details and confirmation.':'The operation could not be completed. Review the current state before retrying.';
+    const message=translate(locale,status===404?'Access is unavailable. Sign in again or request a fresh link through the sandbox operator workflow.':status===429?'Please wait before trying again.':status===409?'The dates or operation key are already in use. Review current availability before submitting a new operation.':status===400?'The request was not accepted. Review every field and confirm the action before submitting.':'The operation could not be completed. Refresh to inspect its current state before retrying.');
     if(form)return redirect(`${path.startsWith('guest/')?'/manage':'/admin'}?notice=${status===409?'conflict':status===404?'access-denied':status===400?'invalid-input':'retry'}`);
     return NextResponse.json({error:message},{status,headers:{...privateHeaders,...status===429?{'Retry-After':'60'}:{}}});
   }

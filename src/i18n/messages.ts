@@ -1,0 +1,30 @@
+import { catalog, type MessageKey } from './catalog';
+import { type Locale, localePath } from './routing';
+import * as format from './format';
+export function translate(locale: Locale, key: MessageKey, values: Record<string,string|number> = {}): string {
+  const message=catalog[key]?.[locale];
+  // A broken contractual translation must fail closed, never silently substitute terms.
+  if (!message) throw new Error('Translation unavailable');
+  return message.replace(/\{(\w+)\}/g, (_,name:string)=>{if(!(name in values))throw new Error('Translation value unavailable');return String(values[name]);});
+}
+export const statusMessages = {
+  BOOKING_CONFIRMED:['Užsakymo patvirtinimas','Booking confirmation','Buchungsbestätigung'],GUEST_ACCESS_LINK:['Svečio prieigos nuoroda','Guest access link','Gastzugangslink'],BALANCE_WARNING:['Likučio mokėjimo priminimas','Balance payment warning','Hinweis zur Restzahlung'],BALANCE_OVERDUE:['Praleistas likučio terminas','Balance overdue notice','Mitteilung zum überfälligen Restbetrag'],CANCELLED_GUEST_LATE:['Svečio vėlyvas atšaukimas; vertinimas būtinas','Late guest cancellation; assessment required','Späte Gaststornierung; Bewertung erforderlich'],ASSESSMENT_FINALIZED:['Vertinimas patvirtintas','Assessment approved','Bewertung genehmigt'],REFUND_SUCCEEDED:['Grąžinimas patvirtintas','Refund verified','Erstattung bestätigt'],GUEST_PAYMENT_UPDATE:['Svečio mokėjimo būklės pranešimas','Guest payment status update','Aktualisierung zum Gastzahlungsstatus'],REFUND_INTERVENTION:['Grąžinimui būtina peržiūra','Refund review required','Erstattungsprüfung erforderlich'],UNALLOCATABLE_CAPTURE:['Nepriskirtas gautas mokėjimas','Unallocatable captured payment','Nicht zuordenbare eingezogene Zahlung'],PAYMENT_EVIDENCE_MISMATCH:['Mokėjimo įrodymų neatitiktis','Payment evidence mismatch','Widersprüchliche Zahlungsnachweise'],DELIVERY_FAILURE:['Pristatymas nepavyko','Delivery failure','Versandfehler'],
+  INITIAL_DUE:['Laukiama pradinio mokėjimo','Initial payment due','Anfangszahlung fällig'],BALANCE_DUE:['Mokėtinas likutis','Balance due','Restbetrag fällig'],REFUNDED_PARTIAL:['Dalis grąžinimo patvirtinta','Partially refunded; verified','Teilweise erstattet; bestätigt'],REFUNDED_FULL:['Visas grąžinimas patvirtintas','Fully refunded; verified','Vollständig erstattet; bestätigt'],CANCELLATION_SETTLED:['Atšaukimo atsiskaitymas baigtas','Cancellation settled','Stornierung abgerechnet'],
+  CANCELLED_GUEST:['Svečio atšaukta','Cancelled by guest','Vom Gast storniert'],CANCELLED_PROVIDER:['Teikėjo atšaukta','Cancelled by provider','Vom Anbieter storniert'],CANCELLED_NONPAYMENT:['Atšaukta nesumokėjus','Cancelled for nonpayment','Wegen Nichtzahlung storniert'],EXPIRED:['Galiojimas baigėsi','Expired','Abgelaufen'],COMPLETED:['Viešnagė baigta','Stay completed','Aufenthalt abgeschlossen'],OPEN:['Neišspręsta','Open','Offen'],RESOLVED:['Išspręsta','Resolved','Geklärt'],
+  CONFIRMED:['Patvirtinta','Confirmed','Bestätigt'],CANCELLED:['Atšaukta','Cancelled','Storniert'],AWAITING_INITIAL_PAYMENT:['Laukiama pradinio mokėjimo','Awaiting initial payment','Anfangszahlung ausstehend'],
+  PROCESSING:['Apdorojama; dar nepatvirtinta','Processing; not yet verified','In Bearbeitung; noch nicht bestätigt'],REFUNDED:['Grąžinimas patvirtintas','Refund verified','Erstattung bestätigt'],PENDING:['Laukiama','Pending','Ausstehend'],SUPPRESSED:['Pristatymas sustabdytas','Delivery suppressed','Versand unterdrückt'],
+  SUCCEEDED:['Patvirtinta sėkmė','Verified success','Bestätigt erfolgreich'],FAILED:['Nepavyko','Failed','Fehlgeschlagen'],QUEUED:['Eilėje','Queued','Vorgemerkt'],SENDING:['Siunčiama','Sending','Wird gesendet'],SENT:['Išsiųsta','Sent','Gesendet'],RETRY_WAIT:['Laukiama kartojimo','Waiting to retry','Wiederholung ausstehend'],
+  PRIVATE_USE:['Privatus savininko naudojimas','Owner private use','Private Eigentümernutzung'],MAINTENANCE:['Priežiūra','Maintenance','Wartung'],OTHER:['Kitas uždarymas','Other closure','Sonstige Sperre'],PENDING_HOLD:['Neišspręsta laikina rezervacija','Pending or unresolved hold','Offene oder ungeklärte Vormerkung'],CONFIRMED_BOOKING:['Patvirtintas užsakymas','Confirmed booking','Bestätigte Buchung'],
+  FINAL:['Galutinis vertinimas','Final assessment','Abschließende Bewertung'],REVISION_PENDING:['Laukiama redakcijos','Revision pending','Revision ausstehend'],NOT_SUBMITTED:['Nepateikta','Not submitted','Nicht eingereicht'],REQUESTED:['Prašymas pateiktas','Requested','Angefordert'],OWED:['Mokėtina grąžinti','Refund owed','Erstattung geschuldet'],
+  PAID_IN_FULL:['Visiškai apmokėta','Paid in full','Vollständig bezahlt'],BALANCE_OUTSTANDING:['Nesumokėtas likutis','Balance outstanding','Restbetrag offen'],OVERDUE:['Terminas praleistas','Overdue','Überfällig'],REFUND_DUE:['Grąžintina suma','Refund due','Erstattung fällig'],ASSESSMENT_PENDING:['Laukiama vertinimo','Assessment pending','Bewertung ausstehend'],PAYMENT_INCIDENT:['Mokėjimo incidentas','Payment incident','Zahlungsvorfall'],
+  operations:['Operacijos','Operations','Betrieb'],finance:['Finansai','Finance','Finanzen'],administrator:['Administratorius','Administrator','Administrator'],INITIAL:['Pradinis mokėjimas','Initial payment','Anfangszahlung'],BALANCE:['Likutis','Balance','Restbetrag'],
+} as const;
+export function statusLabel(value:string,locale:Locale) {
+  const values=statusMessages[value as keyof typeof statusMessages];
+  // Unknown historical machine states retain their exact evidence identifier and a localized label.
+  return values ? values[locale==='lt'?0:locale==='en'?1:2] : `${translate(locale,'State')}: ${value}`;
+}
+export function presentation(locale:Locale) {
+  const t=(key:MessageKey,values?:Record<string,string|number>)=>translate(locale,key,values);
+  return {locale,t,href:(path:string)=>localePath(locale,path),money:(value:string|bigint)=>format.money(value,locale),day:(value:string)=>format.day(value,locale),instant:(value:Date)=>format.instant(value,locale),statusLabel:(value:string)=>statusLabel(value,locale),unitName:(key:string)=>({ 'forest-cottage':t('Forest Cottage'),'lakeside-cabin':t('Lakeside Cabin'),'family-cottage':t('Family Cottage')}[key]??key)};
+}

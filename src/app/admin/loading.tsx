@@ -1,1 +1,5 @@
-export default function Loading(){return <div role="status"><h1>Loading workspace</h1><p>Checking access and retrieving current records…</p></div>;}
+'use client';
+import { usePresentation } from '@/i18n/client';
+export default function Loading(){
+  const {t}=usePresentation();
+return <div role="status"><h1>{t("Loading workspace")}</h1><p>{t("Checking access and retrieving current records…")}</p></div>;}

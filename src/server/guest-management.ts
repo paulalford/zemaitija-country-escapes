@@ -8,8 +8,8 @@ import { paymentPosition } from './payment-position';
 export async function guestBooking(pool:Pool,raw:string,bookingId?:string) {
   const s=await requireSession(pool,raw,'guest','booking:view',bookingId);
   const row=(await pool.query<{id:string;unit_key:string;arrival_date:string;departure_date:string;guest_count:number;status:string;
-    accepted_at:Date;balance_due_at:Date;scheduled_arrival_at:Date;total_cents:string;initial_cents:string;balance_cents:string;terms_version:string;policy_version:string}>(`SELECT b.id,u.unit_key,b.arrival_date::text,b.departure_date::text,b.guest_count,b.status,
-    b.accepted_at,b.balance_due_at,b.scheduled_arrival_at,p.total_cents::text,p.initial_cents::text,p.balance_cents::text,p.terms_version,p.policy_version
+    accepted_at:Date;warning_at:Date;grace_ends_at:Date;balance_due_at:Date;scheduled_arrival_at:Date;total_cents:string;initial_cents:string;balance_cents:string;locale:'lt'|'en'|'de';terms_version:string;policy_version:string}>(`SELECT b.id,u.unit_key,b.arrival_date::text,b.departure_date::text,b.guest_count,b.status,
+    b.accepted_at,b.warning_at,b.grace_ends_at,b.balance_due_at,b.scheduled_arrival_at,p.total_cents::text,p.initial_cents::text,p.balance_cents::text,p.terms_version,p.policy_version,p.locale
     FROM bookings b JOIN price_snapshots p ON p.booking_id=b.id JOIN accommodation_units u ON u.id=b.unit_id
     WHERE b.id=$1 AND b.guest_id=$2`,[s.booking_id,s.guest_id])).rows[0];
   if(!row)return deny(pool,s);

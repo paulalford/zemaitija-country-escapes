@@ -111,3 +111,13 @@
   .mobile-payment-summary .facts { margin-bottom: 0; }
   .mobile-payment-summary strong { font-size: 1.35rem; }
 }
+
+/* Translations grow vertically and wrap without widening forms or the page. */
+.language-switcher { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; max-width: 78rem; margin: auto; padding: .5rem 1.5rem; }
+.language-switcher a { display: inline-flex; align-items: center; min-height: 44px; }
+.language-switcher [aria-current="page"] { font-weight: 750; text-decoration-thickness: 2px; }
+.workspace-header { flex-wrap: wrap; }
+.workspace-main, .workspace-columns > *, .form-grid > *, .workspace fieldset { min-width: 0; }
+.workspace button, .workspace label, .workspace h1, .workspace h2, .workspace th, .workspace td { overflow-wrap: anywhere; }
+.calendar-toolbar nav { flex-wrap: wrap; }
+.workspace input:not([type="checkbox"]), .workspace select, .workspace textarea { font-size: 1rem; }

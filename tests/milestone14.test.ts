@@ -622,3 +622,33 @@ describe('Milestone 14 independent security review: administrator identity and r
     expect((await admin.query("SELECT count(*)::int n FROM admin_users WHERE role NOT IN ('operations','finance','administrator')")).rows[0].n).toBe(0);
   });
 });
+
+describe('Milestone 15 locale changes preserve authenticated authority',()=>{
+  it('retains the guest session, contractual locale, snapshot and one-use action consumption across all viewing languages',async()=>{
+    const {localePath}=await import('../src/i18n/routing');
+    const f=await fixture('de'),g=await guest(f),first=await requireSession(runtime,g.raw,'guest');
+    const before=(await admin.query('SELECT row_to_json(p) snapshot FROM price_snapshots p WHERE booking_id=$1',[f.booking.bookingId])).rows[0].snapshot;
+    const action=await mintAction(runtime,g.raw,'guest','booking:renew',f.booking.bookingId);
+    await consumeAction(runtime,first,action,'booking:renew',f.booking.bookingId);
+    for(const locale of ['lt','en','de'] as const){
+      expect(localePath(locale,'/manage')).toBe(`/${locale}/manage`);
+      expect((await requireSession(runtime,g.raw,'guest')).id).toBe(first.id);
+      expect((await guestBooking(runtime,g.raw)).booking.locale).toBe('de');
+      await expect(consumeAction(runtime,first,action,'booking:renew',f.booking.bookingId)).rejects.toBeInstanceOf(AccessDenied);
+    }
+    expect((await admin.query('SELECT row_to_json(p) snapshot FROM price_snapshots p WHERE booking_id=$1',[f.booking.bookingId])).rows[0].snapshot).toEqual(before);
+  });
+  it('preserves current administrator identity and unit permissions, and localizes logout without changing callback validation',async()=>{
+    const {localePath}=await import('../src/i18n/routing');
+    const u=await unit(),a=await actor('operations',[u]),first=await requireSession(runtime,a.raw,'admin');
+    for(const locale of ['lt','en','de'] as const){
+      expect(localePath(locale,'/admin/calendar')).toBe(`/${locale}/admin/calendar`);
+      const current=await requireSession(runtime,a.raw,'admin');expect(current.id).toBe(first.id);await requireUnit(runtime,current,u);
+      await expect(requireFinance(runtime,current)).rejects.toBeInstanceOf(AccessDenied);
+    }
+    const response=await accessRequest(runtime,req('admin/logout',{},`zce_admin=${a.raw}; zce_locale=de`),'admin/logout');
+    expect(response.headers.get('location')).toBe('http://localhost:3000/de/admin/signin');
+    expect(response.headers.get('set-cookie')).toContain('zce_admin=');
+    await expect(requireSession(runtime,a.raw,'admin')).rejects.toBeInstanceOf(AccessDenied);
+  });
+});
