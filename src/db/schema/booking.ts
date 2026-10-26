@@ -45,6 +45,7 @@ export const guest_access_tokens = pgTable("guest_access_tokens", {
   expires_at: timestamp("expires_at", { withTimezone: true }).notNull(),
   revoked_at: timestamp("revoked_at", { withTimezone: true }),
   last_used_at: timestamp("last_used_at", { withTimezone: true }),
+  consumed_at: timestamp("consumed_at", { withTimezone: true }),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -89,6 +90,7 @@ export const inventory_claims = pgTable("inventory_claims", {
 export const admin_users = pgTable("admin_users", {
   id: uuid("id").primaryKey().notNull(),
   external_subject: text("external_subject").notNull(),
+  auth_version: integer("auth_version").notNull().default(1),
   role: text("role").notNull(),
   enabled: boolean("enabled").notNull(),
   disabled_at: timestamp("disabled_at", { withTimezone: true }),

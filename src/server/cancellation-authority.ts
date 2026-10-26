@@ -5,7 +5,7 @@ import type { Pool, PoolClient } from 'pg';
 /** Assertions from a trusted internal authentication adapter, never request JSON.
  * Milestone 14 must verify credentials before constructing this context. */
 export type InternalAuthority = {
-  service: string; authorizationRef: string; expiresAt: Date;
+  service: string; authorizationRef: string; expiresAt: Date; sessionId?:string;
 } & ({ kind:'GUEST'; guestId:string; bookingId:string; scope:'booking:cancel' } |
      { kind:'OPERATOR'; adminId:string });
 export class AuthorizationDeniedError extends Error {
@@ -32,9 +32,28 @@ export async function authorize(client:Pool|PoolClient,authority:InternalAuthori
     valid=permission==='cancel' && authority.scope==='booking:cancel' && authority.bookingId===bookingId &&
       !!(await client.query('SELECT id FROM bookings WHERE id=$1 AND guest_id=$2',[bookingId,authority.guestId])).rowCount;
   } else if (valid && authority.kind==='OPERATOR') {
+    if(authority.sessionId)await client.query('SELECT lock_admin_identity($1)',[authority.adminId]);
     const a=await client.query<{role:string}>('SELECT role FROM admin_users WHERE id=$1 AND enabled AND disabled_at IS NULL',[authority.adminId]);
     valid=!!a.rows[0] && (permission==='provider'?['operations','finance','administrator']:['finance','administrator']).includes(a.rows[0].role);
   } else valid=false;
+  // HTTP adapters bind assertions to a live database session. Legacy internal workers
+  // retain their existing trusted-service contract; no route accepts these objects.
+  if(valid && authority.sessionId) {
+    const live=await client.query(`SELECT s.id FROM access_sessions s
+      LEFT JOIN guest_access_tokens t ON t.id=s.guest_token_id LEFT JOIN bookings b ON b.id=t.booking_id
+      LEFT JOIN admin_users a ON a.id=s.admin_user_id WHERE s.id=$1 AND s.revoked_at IS NULL
+      AND s.expires_at>clock_timestamp() AND s.last_used_at>clock_timestamp()-interval '30 minutes'
+      AND ((s.admin_user_id=$2 AND a.enabled AND a.disabled_at IS NULL AND a.auth_version=s.admin_version
+        AND ($5<>'finance' OR s.authenticated_at>clock_timestamp()-interval '10 minutes')
+        AND ($5<>'provider' OR a.role<>'operations' OR EXISTS(SELECT 1 FROM admin_unit_access ua
+          JOIN bookings target ON target.unit_id=ua.unit_id WHERE target.id=$4 AND ua.admin_user_id=a.id)))
+      OR (b.guest_id=$3 AND t.booking_id=$4 AND t.revoked_at IS NULL AND 'booking:cancel'=ANY(s.scopes)
+        AND EXISTS(SELECT 1 FROM access_actions x WHERE x.id::text=$6 AND x.session_id=s.id AND x.booking_id=$4
+          AND x.operation='booking:cancel' AND x.consumed_at IS NOT NULL AND x.expires_at>clock_timestamp())))`,
+      [authority.sessionId,authority.kind==='OPERATOR'?authority.adminId:null,authority.kind==='GUEST'?authority.guestId:null,
+        bookingId??null,permission,authority.authorizationRef]);
+    valid=!!live.rowCount;
+  }
   if (!valid) {
     const error=new AuthorizationDeniedError();
     await recordAuthorizationDenial(client,error);

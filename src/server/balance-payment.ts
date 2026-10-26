@@ -54,7 +54,7 @@ async function withBalanceLock<T>(pool:Pool,attemptId:string,work:(client:PoolCl
 }
 
 /** Trusted service entry point. Guest authorization belongs to the caller. */
-export async function requestBalanceCheckout(pool:Pool,bookingId:string):Promise<{attemptId:string;commandId:string}|null> {
+export async function requestBalanceCheckout(pool:Pool,bookingId:string,recheckAccess?:(client:PoolClient)=>Promise<void>):Promise<{attemptId:string;commandId:string}|null> {
   const client=await pool.connect();
   try {
     await client.query('BEGIN');
@@ -64,6 +64,7 @@ export async function requestBalanceCheckout(pool:Pool,bookingId:string):Promise
     if (!owner.rows[0]) { await client.query('COMMIT'); return null; }
     await client.query('SELECT lock_acceptance_context($1,$2)',[owner.rows[0].unit_id,owner.rows[0].guest_id]);
     await client.query('SELECT id FROM bookings WHERE id=$1 FOR UPDATE',[bookingId]);
+    if(recheckAccess)await recheckAccess(client);
     const due=await client.query<{id:string;amount_cents:string;status:string;allocated:string}>(`SELECT o.id,o.amount_cents::text,b.status,
       COALESCE((SELECT sum(pa.amount_cents) FROM payment_allocations pa WHERE pa.obligation_id=o.id),0)::text allocated
       FROM bookings b JOIN payment_obligations o ON o.booking_id=b.id AND o.kind='BALANCE'

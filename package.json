@@ -15,11 +15,13 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:check": "drizzle-kit check",
-    "db:seed:dev": "node scripts/seed-reference.mjs"
+    "db:seed:dev": "node scripts/seed-reference.mjs",
+    "admin:provision:dev": "node --experimental-strip-types scripts/provision-admin.ts"
   },
   "dependencies": {
     "drizzle-orm": "0.45.4",
     "next": "16.4.2",
+    "openid-client": "6.8.8",
     "pg": "8.23.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",

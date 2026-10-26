@@ -204,6 +204,41 @@
       "when": 1792925386974,
       "tag": "0028_cancellation_trigger_row_shape",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792951829965,
+      "tag": "0029_access_management",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1792952468552,
+      "tag": "0030_managed_claim_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792952764518,
+      "tag": "0031_identity_lock_capability",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792953166697,
+      "tag": "0032_identity_authorization_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792988290072,
+      "tag": "0033_guest_access_revocation_boundary",
+      "breakpoints": true
     }
   ]
 }

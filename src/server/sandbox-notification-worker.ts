@@ -1,6 +1,7 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
+import { accessLinkForNotice, GuestAccessRevoked } from './guest-management';
 import { financialNoticeContent, financialNoticeEvents } from './financial-notifications';
 import { formatVilnius, noticeContent, type NoticeKind } from './nonpayment-notices';
 
@@ -27,11 +28,11 @@ export class MemorySandboxTransport implements SandboxTransport {
   async lookup(key:string) {const prior=this.messages.get(key);return prior?{messageId:prior.messageId}:null;}
 }
 const operationsOnly=new Set(['UNALLOCATABLE_CAPTURE','PAYMENT_EVIDENCE_MISMATCH','DELIVERY_FAILURE','REFUND_INTERVENTION']);
-const supported=new Set(['BOOKING_CONFIRMED','PAID_IN_FULL','BALANCE_WARNING','BALANCE_DUE','BALANCE_OVERDUE','CANCELLED_NONPAYMENT',...financialNoticeEvents,...operationsOnly]);
+const supported=new Set(['GUEST_ACCESS_LINK','BOOKING_CONFIRMED','PAID_IN_FULL','BALANCE_WARNING','BALANCE_DUE','BALANCE_OVERDUE','CANCELLED_NONPAYMENT',...financialNoticeEvents,...operationsOnly]);
 const retryMinutes=[1,5,30,120,720];
 const jitter=(key:string,attempt:number)=>[...key].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,attempt)%30;
 function obsolete(row:Row,now:Date,outstanding:bigint):string|null {
-  if (operationsOnly.has(row.event_type)) return null;
+  if (row.event_type==='GUEST_ACCESS_LINK' || operationsOnly.has(row.event_type)) return null;
   if (row.event_type==='CANCELLED_NONPAYMENT'||financialNoticeEvents.includes(row.event_type)) return null;
   if (row.status!=='CONFIRMED') return 'BOOKING_NOT_CONFIRMED';
   if (row.event_type==='BOOKING_CONFIRMED' || row.event_type==='PAID_IN_FULL') return null;
@@ -40,6 +41,11 @@ function obsolete(row:Row,now:Date,outstanding:bigint):string|null {
   return null;
 }
 function body(row:Row,now:Date):string {
+  if(row.event_type==='GUEST_ACCESS_LINK')return {
+    lt:'Tvarkykite demonstracinį užsakymą naudodami toliau pateiktą vienkartinę nuorodą. Ji galioja 15 minučių.',
+    en:'Manage your synthetic booking using the single-use link below. It expires in 15 minutes.',
+    de:'Verwalten Sie Ihre fiktive Buchung über den einmalig nutzbaren Link unten. Er ist 15 Minuten gültig.',
+  }[row.locale];
   if(financialNoticeEvents.includes(row.event_type))return financialNoticeContent(row.event_type,row.locale,row.audit_amount??row.audit_details?.amountCents??null,row.total_cents);
   const subject=row.provider_incident_id?`incident ${row.provider_incident_id}`:`booking ${row.booking_id}`;
   if (row.event_type==='UNALLOCATABLE_CAPTURE') return {
@@ -151,7 +157,7 @@ export async function deliverOneSandboxNotice(pool:Pool,transport:SandboxTranspo
       finally {stop.release();}
     }
   }
-  let result:{messageId:string}|undefined,errorCode:string|null=null,uncertain=false;
+  let result:{messageId:string}|undefined,errorCode:string|null=null,uncertain=false,suppressed=false;
   try {const prior=await transport.lookup(row.idempotency_key);
     if (prior===undefined) uncertain=true;
     else if (prior) result=prior;
@@ -165,13 +171,18 @@ export async function deliverOneSandboxNotice(pool:Pool,transport:SandboxTranspo
       } catch(e) {await check.query('ROLLBACK').catch(()=>{});throw e;}
       finally {check.release();}
       if (!authoritative) return 'STALE';
+      const link=row.recipient_kind==='GUEST' && (row.event_type==='GUEST_ACCESS_LINK' || process.env.ACCESS_SECRET && process.env.APP_ORIGIN)
+        ? await accessLinkForNotice(pool,row.id,attemptId) : null;
       result=await transport.send({key:row.idempotency_key,recipientKind:row.recipient_kind,
-        recipientRef:row.recipient_ref,locale:row.locale,body:body(row,now)});
+        recipientRef:row.recipient_ref,locale:row.locale,body:body(row,now)+(link?`\n\n${link}`:'')});
     }
   } catch(e) {
-    errorCode=e instanceof Error?e.name:'TRANSPORT_ERROR';
-    try {const check=await transport.lookup(row.idempotency_key);if (check) result=check;else uncertain=check===undefined;}
-    catch {uncertain=true;}
+    if(e instanceof GuestAccessRevoked)suppressed=true;
+    else {
+      errorCode=e instanceof Error?e.name:'TRANSPORT_ERROR';
+      try {const check=await transport.lookup(row.idempotency_key);if (check) result=check;else uncertain=check===undefined;}
+      catch {uncertain=true;}
+    }
   }
   const finish=await pool.connect();
   try {
@@ -184,7 +195,14 @@ export async function deliverOneSandboxNotice(pool:Pool,transport:SandboxTranspo
     }
     const finishedAt=completionTime();
     let finalState='SENT';
-    if (result) {
+    if (suppressed) {
+      finalState='SUPPRESSED';
+      await finish.query("UPDATE notification_delivery_attempts SET result='SUPPRESSED',finished_at=$2,error_code='GUEST_ACCESS_REVOKED' WHERE id=$1",[attemptId,finishedAt]);
+      await finish.query("UPDATE notification_outbox SET state='SUPPRESSED',lease_until=NULL,suppression_reason='GUEST_ACCESS_REVOKED' WHERE id=$1",[row.id]);
+      await finish.query(`INSERT INTO audit_events(id,booking_id,actor_kind,service_name,action,entity_type,entity_id,reason_code,occurred_at)
+        VALUES($1,$2,'SERVICE','sandbox-notification-worker','notice.suppressed','notification',$3,'GUEST_ACCESS_REVOKED',$4)`,
+        [randomUUID(),row.booking_id,row.id,finishedAt]);
+    } else if (result) {
       await finish.query("UPDATE notification_delivery_attempts SET result='ACCEPTED',finished_at=$2,provider_message_id=$3 WHERE id=$1",[attemptId,finishedAt,result.messageId]);
       await finish.query("UPDATE notification_outbox SET state='SENT',lease_until=NULL,provider_message_id=$2 WHERE id=$1",[row.id,result.messageId]);
     } else {

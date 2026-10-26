@@ -89,6 +89,7 @@ export const reconciliation_records = pgTable("reconciliation_records", {
 
 export const notification_outbox = pgTable("notification_outbox", {
   id: uuid("id").primaryKey().notNull(),
+  guest_access_generation: integer("guest_access_generation"),
   booking_id: uuid("booking_id").references((): AnyPgColumn => bookings.id, { onDelete: "restrict" }),
   provider_incident_id: uuid("provider_incident_id").references((): AnyPgColumn => provider_incidents.id, { onDelete: "restrict" }),
   source_audit_event_id: uuid("source_audit_event_id").references((): AnyPgColumn => audit_events.id, { onDelete: "restrict" }).notNull(),

@@ -52,9 +52,9 @@ describe("Milestone 5 PostgreSQL baseline", () => {
     await pool.end();
   });
 
-  it("has 28 model tables, foreign keys and the single inventory exclusion", async () => {
+  it("has the current model tables, foreign keys and the single inventory exclusion", async () => {
     const tables = await pool.query("SELECT count(*)::int AS n FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'");
-    expect(tables.rows[0].n).toBe(28);
+    expect(tables.rows[0].n).toBe(34);
     const constraints = await pool.query("SELECT contype, conname FROM pg_constraint WHERE conrelid='inventory_claims'::regclass");
     expect(constraints.rows.filter((r) => r.contype === "x").map((r) => r.conname)).toEqual(["inventory_claims_no_overlap"]);
     expect(constraints.rows.some((r) => r.contype === "f")).toBe(true);

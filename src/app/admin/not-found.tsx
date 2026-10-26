@@ -1,0 +1,1 @@
+export default function Unavailable(){return <><h1>Reservation unavailable</h1><p className="notice">Sign in with an authorized identity and review your accommodation permissions before continuing.</p></>;}
