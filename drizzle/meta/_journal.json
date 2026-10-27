@@ -239,6 +239,13 @@
       "when": 1792988290072,
       "tag": "0033_guest_access_revocation_boundary",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1793038526264,
+      "tag": "0034_public_synthetic_guest",
+      "breakpoints": true
     }
   ]
 }

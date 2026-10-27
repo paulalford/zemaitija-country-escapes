@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T18:29:20.172723+00:00",
+  "title": "Design System: Žemaitija Country Escapes — public Timber Index extension",
+  "extensions": {
+    "breakpoints": [
+      {
+        "name": "public-search-wrap",
+        "value": "1100px"
+      },
+      {
+        "name": "public-mobile",
+        "value": "760px"
+      },
+      {
+        "name": "public-narrow",
+        "value": "380px"
+      },
+      {
+        "name": "public-wide-centering",
+        "value": "1600px"
+      }
+    ],
+    "shadows": [],
+    "motion": [],
+    "typographyMeta": {
+      "public-display": {
+        "displayName": "Cormorant Garamond / Timber Serif",
+        "purpose": "Public display headings. Local Latin and Latin Extended WOFF2 subsets support LT/EN/DE; Georgia fallback; font-display swap."
+      },
+      "public-body": {
+        "displayName": "Public Arial supporting text",
+        "purpose": "Public reading text, facts, controls and language navigation. Workspace type remains unchanged."
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Public primary action",
+      "kind": "button",
+      "refersTo": "public-button-primary",
+      "description": "Native action or semantic navigation link; minimum height 48px.",
+      "html": "<button class=\"ds-public-primary\">Check availability →</button>",
+      "css": ".ds-public-primary{display:inline-flex;align-items:center;justify-content:center;gap:.8rem;min-height:48px;padding:.8rem 1.3rem;border:1px solid #103b2d;border-radius:3px;font:600 1rem/1.4 Arial,Helvetica,sans-serif;cursor:pointer;text-decoration:none;text-align:center;background:#103b2d;color:#faf8f0}.ds-public-primary:hover{background:#27523c}.ds-public-primary:focus-visible{outline:3px solid #a95426;outline-offset:4px}.ds-public-primary:disabled{opacity:.6;cursor:wait}"
+    },
+    {
+      "name": "Public secondary action",
+      "kind": "button",
+      "refersTo": "public-button-secondary",
+      "description": "Change dates or explore a stay.",
+      "html": "<button class=\"ds-public-secondary\">Change dates</button>",
+      "css": ".ds-public-secondary{display:inline-flex;align-items:center;justify-content:center;gap:.8rem;min-height:48px;padding:.8rem 1.3rem;border:1px solid #103b2d;border-radius:3px;font:600 1rem/1.4 Arial,Helvetica,sans-serif;cursor:pointer;text-decoration:none;text-align:center;background:transparent;color:#103b2d;border-color:#748879}.ds-public-secondary:hover{background:#e4e9dc}.ds-public-secondary:focus-visible{outline:3px solid #a95426;outline-offset:4px}"
+    },
+    {
+      "name": "Public native field",
+      "kind": "input",
+      "refersTo": "public-input",
+      "description": "Persistent label and readable input text.",
+      "html": "<label class=\"ds-public-label\">Guests<input class=\"ds-public-input\" type=\"number\" min=\"1\" value=\"2\"></label>",
+      "css": ".ds-public-label{display:flex;flex-direction:column;gap:.4rem;font:.95rem/1.6 Arial,Helvetica,sans-serif;color:#16382e}.ds-public-input{background:#faf8f0;border:1px solid #798d7d;border-radius:3px;padding:.7rem .75rem;min-height:48px;color:#16382e;font:400 1rem/1.4 Arial,Helvetica,sans-serif}.ds-public-input:focus-visible{outline:3px solid #a95426;outline-offset:4px}"
+    },
+    {
+      "name": "Visible language navigation",
+      "kind": "nav",
+      "description": "Ordinary semantic language links remain visible at every width.",
+      "html": "<nav class=\"ds-public-languages\" aria-label=\"Language\"><a href=\"#lt\">Lietuvių</a><a href=\"#en\" aria-current=\"page\">English</a><a href=\"#de\">Deutsch</a></nav>",
+      "css": ".ds-public-languages{display:flex;flex-wrap:wrap;gap:1rem;background:#103b2d;color:#faf8f0;padding:1rem;font:.9rem/1.6 Arial,Helvetica,sans-serif}.ds-public-languages a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:none;text-underline-offset:.3em}.ds-public-languages a:hover,.ds-public-languages a[aria-current]{text-decoration:underline}.ds-public-languages a[aria-current]{font-weight:700}.ds-public-languages a:focus-visible{outline:3px solid #f2ca8b;outline-offset:4px}"
+    },
+    {
+      "name": "Native demo policy disclosure",
+      "kind": "custom",
+      "description": "Full policies stay in a native expandable disclosure; snippet labels the pattern without fabricating policy copy.",
+      "html": "<details class=\"ds-public-terms\"><summary>Demo terms: payment, cancellation and refunds</summary><p>Render the complete unchanged localized policy content here.</p></details>",
+      "css": ".ds-public-terms{margin:1.5rem 0;border-top:1px solid #b9c4b6;border-bottom:1px solid #b9c4b6;padding:.5rem 0;max-width:750px;color:#16382e;font:1rem/1.6 Arial,Helvetica,sans-serif}.ds-public-terms summary{padding:.6rem 0;min-height:44px;cursor:pointer;text-decoration:underline;text-underline-offset:.3em}.ds-public-terms summary:hover{text-decoration-thickness:2px}.ds-public-terms summary:focus-visible{outline:3px solid #a95426;outline-offset:4px}"
+    },
+    {
+      "name": "Illustration disclosure band",
+      "kind": "custom",
+      "refersTo": "public-illustration-caption",
+      "description": "Opaque caption always adjacent to illustrative imagery.",
+      "html": "<p class=\"ds-public-caption\">AI-generated regional illustration. No real property or facilities are depicted.</p>",
+      "css": ".ds-public-caption{background:#103b2d;color:#faf8f0;padding:.7rem 1rem;font:.9375rem/1.5 Arial,Helvetica,sans-serif;margin:0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Timber Index",
+    "overview": "The user-selected Timber Index extends the Regional Catalogue onto approved public discovery, comparison, accommodation detail and booking surfaces. It is an ordinary public extension, not a workspace redesign. All preceding workspace tokens and rules remain unchanged and authoritative for their original scope; public- tokens apply only inside the public shell.",
+    "keyCharacteristics": [
+      "Ruled forest-green accommodation index and substantial regional illustration.",
+      "Warm date-search strip before the illustration on mobile.",
+      "Local display serif and supporting Arial.",
+      "Visible fictional-demo and image disclosures; prominent initial test-payment obligation."
+    ],
+    "rules": [],
+    "dos": [
+      "Keep Timber Index scoped to public pages.",
+      "Preserve the established workspace hierarchy, palette and controls."
+    ],
+    "donts": [
+      "Do not replace the native policy disclosure with abbreviated policy text or preselect synthetic acknowledgements."
+    ]
+  },
+  "provenance": {
+    "scope": "Milestone 16 Phase B public extension only",
+    "authority": "DESIGN.md public- frontmatter tokens and public extension sections",
+    "preservedSidecar": ".impeccable/design.json",
+    "preservationReason": "Explicit user boundary preserves existing stale workspace/Phase A Impeccable artifacts. This separate extension does not repair or claim freshness of those artifacts.",
+    "sourceFiles": [
+      "src/app/public-ui/timber.css",
+      "src/app/public-ui/shell.tsx",
+      "src/app/page.tsx",
+      "src/app/accommodations/page.tsx",
+      "src/app/accommodations/[slug]/page.tsx",
+      "src/app/booking/stay-form.tsx"
+    ],
+    "visualEvidence": ".impeccable/review/m16",
+    "limitations": [
+      "No automated region-map or comp-diff completion is claimed.",
+      "Original Phase A state intentionally preserved.",
+      "Snippets demonstrate implemented component patterns; illustrative payment amounts and complete policy text are not fabricated.",
+      "Existing CSS variables are scoped under .timber rather than :root, so panel snippets use literal observed CSS values."
+    ]
+  }
+}

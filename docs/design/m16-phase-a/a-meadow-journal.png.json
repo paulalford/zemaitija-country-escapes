@@ -1,0 +1,36 @@
+{
+  "status": "pending-user-approval",
+  "approved": false,
+  "created": "2026-10-26",
+  "tool": "OpenAI built-in imagegen",
+  "artifact_kind": "Phase A raster composition; not production UI",
+  "prompt": "Edit this design board with one precise factual text correction only. In the RIGHT-HAND MOBILE SCREEN, in the Lakeside Cabin entry near the bottom, change the capacity from “Up to 6 guests” to “Up to 2 guests”. The correct catalog is Forest Cottage 2, Lakeside Cabin 2, Family Cottage 6. Preserve everything else: desktop composition, all images, all typography, full board dimensions, navigation, disclosures and form. Do not change any other content or regenerate the layout. Ensure the mobile Lakeside Cabin text visibly reads “Fictional accommodation · Up to 2 guests”.",
+  "source_generation_path": "/home/paul/.codex/generated_images/01a178d3-f708-7893-b57b-673604e72f09/exec-e9dd8850-fa2f-4968-8cb2-8e50be9b2731.png",
+  "lineage": [
+    {
+      "key": "a-desktop",
+      "prompt": "Create a high-fidelity English desktop website composition for “Žemaitija Country Escapes”, a fictional Lithuanian countryside accommodation booking demo inspired by the Plateliai area. Render the actual web page edge to edge, crisp legible UI, landscape 1440×1100 equivalent, no browser frame or surrounding objects. Real content: Forest Cottage, up to 2 guests; Lakeside Cabin, up to 2 guests; Family Cottage, up to 6 guests. Header includes the full brand, “Stays”, “Compare”, “Manage booking”, and “Lietuvių / English / Deutsch”. Show a real-looking availability form with persistent labels Accommodation, Arrival, Departure, Guests and primary action “Check availability”. No availability results or invented price. Prominent readable disclosure: “Fictional portfolio demo · AI-generated illustrations · No real bookings”. Label every property illustration “Illustrative property concept”. Do not invent amenities, reviews, locations, lake access or heritage status. Photorealistic illustrative scenes should reflect documented Samogitian timber rural buildings: broad hipped or half-hipped roofs, modest low timber walls, restrained detail, meadow and mixed spruce/birch woodland, temperate soft light. These are creative interpretations, not reconstructions or real-property photography. Avoid Mediterranean villas, Alpine chalets, Nordic glass cabins, amenities and generic accommodation cards. Direction A, “Meadow journal”: warm paper and deep forest ink; refined literary serif display with readable sans UI. A broad meadow/woodland photograph occupies the upper middle of an editorial page, with a modest timber dwelling small in the landscape; large heading “A quieter stay in Žemaitija.” set on an opaque paper margin above, never on busy photography. Availability sits as a flat ruled strip immediately below the panorama. Below, the three accommodations appear as unequal editorial photo-and-caption entries with capacities and “Explore stay”, not equal cards. The image, caption, search and beginning of accommodation discovery must all be visible. Calm, contemporary, materially grounded, generous but purposeful spacing.",
+      "referenced_image_paths": [],
+      "generated_image": "/home/paul/.codex/generated_images/01a178d3-f708-7893-b57b-673604e72f09/exec-e3ee0c72-9abd-455e-87d6-286805ef4f69.png"
+    },
+    {
+      "key": "a-final",
+      "prompt": "Create a polished design-review board with TWO fully rendered responsive landing-page compositions: desktop on the left, portrait mobile on the right. Use the supplied website image as the edit target and visual reference for “Meadow journal”, Žemaitija Country Escapes. Preserve its warm paper, forest ink, beautiful broad meadow panorama, serif hierarchy, flat ruled booking strip and unequal photographic accommodation entries. Show the complete desktop at readable 1440×1100 equivalent and a genuinely rearranged 390×1350 mobile page, high-resolution landscape board, no devices, browser chrome or perspective. On mobile stack the search fields, preserve visible labels and a full-width “Check availability” action, avoid a shrunk desktop.\nREQUIRED CORRECTIONS to both views: remove decorative leaf logo; use wordmark only. Remove ALL water, docks and waterfront buildings from ALL property illustrations including hero: use meadows and mixed woodland. No property lake access or amenities. Delete invented descriptive copy under each accommodation; replace it only with “Fictional accommodation · Up to 2 guests” for Forest Cottage and Lakeside Cabin, and “Fictional accommodation · Up to 6 guests” for Family Cottage. Replace the hero subcopy with “Three fictional stays, inspired by rural Žemaitija.” Preserve heading “A quieter stay in Žemaitija.” Keep “Lietuvių / English / Deutsch”, Stays, Compare, Manage booking. Arrival/Departure must be empty with “Select date”; Guests “2 guests”. Make “Fictional portfolio demo · AI-generated illustrations · No real bookings” clear near top of BOTH pages, and “Illustrative property concept” readable on images. No eyebrow headings, extra claims, prices or ratings. Concept label outside pages: “A — Meadow journal”.",
+      "referenced_image_paths": [
+        "/home/paul/.codex/generated_images/01a178d3-f708-7893-b57b-673604e72f09/exec-e3ee0c72-9abd-455e-87d6-286805ef4f69.png"
+      ],
+      "generated_image": "/home/paul/.codex/generated_images/01a178d3-f708-7893-b57b-673604e72f09/exec-e167b2a4-bd36-46f4-8988-14c04ce29c08.png"
+    },
+    {
+      "key": "a-corrected",
+      "prompt": "Edit this design board with one precise factual text correction only. In the RIGHT-HAND MOBILE SCREEN, in the Lakeside Cabin entry near the bottom, change the capacity from “Up to 6 guests” to “Up to 2 guests”. The correct catalog is Forest Cottage 2, Lakeside Cabin 2, Family Cottage 6. Preserve everything else: desktop composition, all images, all typography, full board dimensions, navigation, disclosures and form. Do not change any other content or regenerate the layout. Ensure the mobile Lakeside Cabin text visibly reads “Fictional accommodation · Up to 2 guests”.",
+      "referenced_image_paths": [
+        "/home/paul/.codex/generated_images/01a178d3-f708-7893-b57b-673604e72f09/exec-e167b2a4-bd36-46f4-8988-14c04ce29c08.png"
+      ],
+      "generated_image": "/home/paul/.codex/generated_images/01a178d3-f708-7893-b57b-673604e72f09/exec-e9dd8850-fa2f-4968-8cb2-8e50be9b2731.png"
+    }
+  ],
+  "research_sources": "../MILESTONE_16_PHASE_A.md#verified-reference-base",
+  "third_party_photographs_embedded": false,
+  "sha256": "f37fe28c2a4e01b2b29ce8ddd0dcb97336dcf595689c86dda1a04847d7905b90"
+}

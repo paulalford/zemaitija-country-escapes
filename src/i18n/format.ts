@@ -13,6 +13,9 @@ export function day(value: string, locale: Locale = 'lt') {
   if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0,10)!==value) throw new RangeError('Invalid local date');
   return new Intl.DateTimeFormat(localeTags[locale],{day:'numeric',month:'short',year:'numeric',timeZone:propertyZone}).format(date);
 }
-export function instant(value: Date, locale: Locale = 'lt') {
-  return `${new Intl.DateTimeFormat(localeTags[locale],{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:propertyZone,timeZoneName:'shortOffset'}).format(value)} (${propertyZone})`;
+/** Guest presentation requires an adjacent localized Lithuania-time indication. */
+export function instant(value: Date, locale: Locale = 'lt', presentation: 'technical'|'guest' = 'technical') {
+  const formatted=new Intl.DateTimeFormat(localeTags[locale],{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:propertyZone,
+    ...(presentation==='technical'?{timeZoneName:'shortOffset' as const}:{})}).format(value);
+  return presentation==='technical'?`${formatted} (${propertyZone})`:formatted;
 }

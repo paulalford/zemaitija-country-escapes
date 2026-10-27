@@ -1,0 +1,11 @@
+{
+  "source": "/home/paul/.codex/generated_images/01a17962-0a5f-7722-98c4-c2347de87eeb/exec-d9bd74f8-57ce-4a69-ab98-9eec09e1e3ab.png",
+  "tool": "OpenAI built-in imagegen",
+  "prompt": "Use case: photorealistic-natural. Asset: landscape 1536x1024 illustrative image plate for fictional \u017demaitija countryside booking portfolio, approved Timber Index design. Generate only the image, no typography or UI. A modest broad dark timber rural house inspired by Samogitian architecture, substantial hipped roof, broad eaves, low wide windows, restrained detail, mixed birch and spruce woodland clearing, warm natural late-summer daylight. Three-quarter view of complete house surrounded by meadow and trees, editorial photography style, plausible natural texture, muted forest green and warm timber palette. No people, no water, no vehicles, no logos, no amenities, no luxury resort, no Alpine chalet, no glass cabin. This is an invented regional interpretation, not a photograph of a real property. Frame house in middle distance with generous landscape for responsive cropping. Match the architectural atmosphere of approved Concept B, not its UI.",
+  "illustrative": true,
+  "realProperty": false,
+  "license": "Generated illustration; no third-party photography. No exclusive-ownership or legal-clearance claim.",
+  "reference": "Concept B direction; new image plate, no pixels copied from board.",
+  "sha256": "c94adb5099840e46d02dad381b5ab213bb1890c572c750f51415e581ff1663e2",
+  "conversion": "FFmpeg libwebp quality 88; original dimensions retained"
+}

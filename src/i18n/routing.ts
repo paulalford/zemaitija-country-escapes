@@ -12,11 +12,11 @@ export function localePath(locale: Locale, path: string): string {
   if (!isLocale(locale) || !path.startsWith('/') || path.startsWith('//') || /[%\\\x00-\x20#]/.test(path.split('?')[0]) || path.includes('#')) throw new RangeError('Invalid local page');
   const url = new URL(path, 'https://local.invalid');
   const base = stripLocale(url.pathname);
-  if (!/^\/(?:manage(?:\/access)?|admin(?:\/(?:signin|bookings(?:\/[a-f0-9-]{36})?|calendar|incidents|identities))?)?$/.test(base)) throw new RangeError('Unknown local page');
+  if (!/^\/(?:accommodations(?:\/(?:forest-cottage|lakeside-cabin|family-cottage))?|booking(?:\/(?:return|cancel))?|manage(?:\/access)?|admin(?:\/(?:signin|bookings(?:\/[a-f0-9-]{36})?|calendar|incidents|identities))?)?$/.test(base)) throw new RangeError('Unknown local page');
   const query = new URLSearchParams();
-  for (const key of ['notice', 'date', 'view', 'unit']) {
+  for (const key of ['notice', 'date', 'view', 'unit', 'arrival', 'departure', 'guests']) {
     const value = url.searchParams.get(key);
-    if (value && (/^(notice)$/.test(key) ? /^[a-z-]{1,40}$/.test(value) : key === 'date' ? /^\d{4}-\d{2}-\d{2}$/.test(value) : key === 'view' ? /^(month|week)$/.test(value) : /^[a-f0-9-]{36}$/.test(value))) query.set(key,value);
+    if (value && (/^(notice)$/.test(key) ? /^[a-z-]{1,40}$/.test(value) : ['date','arrival','departure'].includes(key) ? /^\d{4}-\d{2}-\d{2}$/.test(value) : key === 'guests' ? /^[1-9]\d{0,3}$/.test(value) : key === 'view' ? /^(month|week)$/.test(value) : /^[a-f0-9-]{36}$/.test(value))) query.set(key,value);
   }
   return `/${locale}${base==='/'?'':base}${query.size?`?${query}`:''}`;
 }
