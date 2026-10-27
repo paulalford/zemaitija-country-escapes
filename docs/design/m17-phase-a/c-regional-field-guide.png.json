@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "approved": false,
+  "status": "pending user selection and independent ChatGPT review",
+  "date": "2026-10-27",
+  "tool": "built-in OpenAI imagegen",
+  "artifactType": "paired desktop and portrait mobile review composition; not viewport screenshots",
+  "dimensions": {
+    "width": 1312,
+    "height": 1199
+  },
+  "prompt": "Make these precise corrections to this desktop/mobile Regional Field Guide review board, preserving its layout and all design. Restore the exact top band on both desktop and mobile: 'Fictional portfolio demo · No real bookings'. Keep 'Independent destinations; no tours sold here' in footer only. Change 'Further afield for a day' to 'Plan a separate excursion' on both views. Add the missing 'Beržoras' row after Lake Plateliai on BOTH desktop and mobile, subtitle 'Wooden sacred architecture'; retain all seven local destinations. On the narrow mobile page include the SAME selected Šeirė Nature Trail detail beneath its local list before regional links: small woodland image with opaque 'AI illustration · Not documentary photography' caption, title 'Šeirė Nature Trail', paragraph 'A trail through forest and wetland. See official visitor information before planning your visit.' and 'Official visitor information' link. Extend mobile page vertically rather than dropping content. On desktop replace the detailed geographic basemap behind the four correct relative points with a quiet plain paper coordinate relationship diagram, no roads/lakes/trails. Retain four positions: trail start slightly northwest of viewpoint; Siberija southwest; Cold War visitor centre southeast at same latitude as Siberija. Add map legend '● Real attraction; dashed area = fictional locality only'. Ensure 'Siberija Viewing Tower' spelled correctly. Add early 'Check availability' action below main introduction on mobile. Body and controls Arial/Helvetica, only headings Cormorant Garamond-like serif. Keep the full dedicated Hill of Crosses/Kryžių kalnas feature, district qualifier, adjacent AI captions and Palanga excursion, all six regional destination links, end booking links. Do not invent new factual claims.",
+  "initialPrompt": "Create a high-fidelity website design review board for Žemaitija Country Escapes: a complete long desktop page on the left and its independently reflowed narrow portrait mobile page on the right, both fully readable, edge-to-edge screens without device frames. Reference image supplies ONLY the approved Timber Index chrome, forest #103b2d, paper #faf8f0, Cormorant Garamond display serif and Arial supporting type, fine rules and flat square sections; do not copy the accommodation hero or its content. Header: brand, Stays, Explore, Check availability, Lietuvių / English / Deutsch; mobile wraps these as visible links. Visible disclosure: 'Fictional portfolio demo · No real bookings'. Guest job: discover real destinations and return to choosing a fictional stay. English review copy. No prices, hours, distances, route lines, property pins, testimonials or badges. Every image has adjacent opaque caption 'AI illustration · Not documentary photography'. Every map says 'Schematic review map · Not for navigation'; legend uses filled dots for real places, broad dashed region for 'Plateliai area · Fictional locality, no property location'. No house icon or centre pin. Footer: 'Independent destinations; no tours sold here.' and 'Compare stays' / 'Check availability'. Concept C — Regional Field Guide. Practical discovery leads with 'Find your Žemaitija.' and three large ruled geographic jump links: 'Around Plateliai', 'Across Žemaitija', 'Major excursions'. Warm-paper opening; the main body is a dense but spacious destination directory opposite a substantial forest-tinted map, with one selected destination 'Šeirė Nature Trail' expanded using a small woodland illustration and 'Official visitor information'. Local entries include Lake Plateliai, Beržoras, Siberija Viewing Tower, Cold War Exposition, Plateliai Manor Park and Žemaičių Kalvarija. Regional ruled index: Telšiai, Alka, Samogitian Village Museum, Mykolas Oginskis Palace, Kretinga Winter Garden, Šatrija Hill. A separate large green feature breaks the directory rhythm: 'Hill of Crosses / Kryžių kalnas', 'Major excursion · Šiauliai district', 'A place of faith and remembrance', then 'Official visitor information'; Palanga follows as a coastal excursion. Mobile shows all three geographic jump links, a clearly labelled Map / List switch, default readable list, then the dedicated full Hill of Crosses feature and compact map inset. No tiny desktop map shrunk into a phone. The booking return remains near top and bottom.",
+  "firstRefinementPrompt": "Refine this desktop/mobile Regional Field Guide website review board. Preserve the practical directory plus substantial map, geographic navigation, warm paper/forest Timber Index look and prominent Hill of Crosses excursion. Remove the three big desktop image cards: replace with three spacious flat ruled geographic text jump links Around Plateliai / Across Žemaitija / Major excursions. Remove all uppercase eyebrows, hamburger and tiny pictorial thumbnails in rows. Mobile top must visibly show Stays / Explore / Check availability plus Lietuvių / English / Deutsch and early booking link. Correct all factual text: Lake Plateliai subtitle 'Žemaitija National Park', never Plateliai Regional Park. Alka subtitle 'Regional history museum', never Sacred hill. Šatrija Hill subtitle 'Samogitian uplands', no lake photograph. Remove invented visitor facilities/boardwalk copy from trail; use 'A trail through forest and wetland. See the official visitor information before planning your visit.' Every illustration, including category headers if retained, has adjacent 'AI illustration · Not documentary photography'. Replace the erroneous detailed local map with a clean four-dot local geographic diagram only: Šeirė trail start at top-left, Lake Plateliai viewpoint just below and slightly right of it, Siberija Viewing Tower far southwest, Cold War visitor centre far southeast at same latitude as tower. No other attraction dots. Broad dashed Plateliai-area zone with no centre pin says 'Fictional locality · No property location'. Label 'Schematic concept · Not for navigation'. On mobile default List is visibly selected and all regional destinations also appear as readable text links before the Hill of Crosses feature. Hill feature exact title 'Hill of Crosses / Kryžių kalnas', subtitle 'Major excursion · Šiauliai district', copy 'A place of faith and remembrance', official visitor information link. Do not place a fictitious exact Hill pin in the inset: show named excursion text instead. Keep Palanga under Major excursions, and lower Compare stays / Check availability links.",
+  "referenceImages": [
+    ".impeccable/mocks/m17-phase-a/c-refinement-1.png"
+  ],
+  "lineage": [
+    {
+      "stage": "initial",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-dfc099e8-f812-4b6f-b127-541ad339d0f6.png",
+      "reference": ".impeccable/review/m16/en-home-1440.png"
+    },
+    {
+      "stage": "first refinement",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-5f7a4248-4694-48f9-820e-5c5f507f1495.png",
+      "reference": ".impeccable/mocks/m17-phase-a/c-regional-field-guide.png"
+    },
+    {
+      "stage": "final refinement",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-17b44506-fcfa-4bf1-ab11-0b6ce5af83d0.png",
+      "reference": ".impeccable/mocks/m17-phase-a/c-refinement-1.png"
+    }
+  ],
+  "sourceSha256": "48a3853b1736894c162db23f1a50ad1ea07e6fcabe5e20f29a1d1a2f42415eb3",
+  "sha256": "a7035c35c176c99fc50f9243430b9c8936b38342b6d94db30677a4a1b7b3bc28",
+  "licensingStatus": "No third-party photographs copied. Generated concept only; no production-image clearance or exclusive ownership claimed.",
+  "geography": "Map pixels are conceptual; use MAP.md and source-backed coordinate evidence. No accommodation coordinates.",
+  "imagery": "AI-generated illustrative arrangements, not documentary depictions of named attractions.",
+  "productionTypography": "Existing Cormorant Garamond / Arial system remains authoritative; raster lettering is approximate."
+}

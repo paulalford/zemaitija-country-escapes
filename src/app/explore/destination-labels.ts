@@ -1,0 +1,3 @@
+import type { DestinationCategory, DestinationGroup } from '@/content/destinations';
+export const groupLabels = { local: 'Around Plateliai', regional: 'Across Žemaitija', excursion: 'Major regional excursions' } as const satisfies Record<DestinationGroup, string>;
+export const categoryLabels = { nature: 'Nature and lakes', walking: 'Walking', viewpoint: 'Viewpoints and landscapes', heritage: 'Architecture and heritage', culture: 'Museums and regional culture', pilgrimage: 'Pilgrimage and remembrance', history: 'Historical sites', excursion: 'Coastal excursions' } as const satisfies Record<DestinationCategory, string>;

@@ -1,3 +1,15 @@
 {
-  "buildPath": "comp"
+  "buildPath": "comp",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-10-27T19:18:12.687Z",
+        "reason": "Approved Timber Index supporting type retained in DESIGN.md; M17 isolated Assessment B confirmed intentional existing-font reuse."
+      }
+    ]
+  }
 }

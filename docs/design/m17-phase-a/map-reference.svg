@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620" role="img" aria-labelledby="title description">
+<title id="title">Verified local attraction coordinate relationships</title>
+<desc id="description">Four official-source attraction points plotted north-up. Šeirė trail start is just northwest of Lake Plateliai viewpoint. Siberija tower is southwest and Cold War visitor centre southeast. The fictional Plateliai locality is a separate dashed text note, with no property geometry. No roads or routes are shown.</desc>
+<rect width="1000" height="620" fill="#faf8f0"/>
+<g fill="#16382e" font-family="Arial,Helvetica,sans-serif">
+<text x="42" y="54" font-family="Georgia,serif" font-size="34">Real destinations. Fictional locality.</text>
+<text x="42" y="89" font-size="16">Coordinate relationship study · North up · Not for navigation</text>
+<path d="M42 110H958" stroke="#b9c4b6"/>
+<a href="https://zemaitijosnp.lt/veikla/lankytini-objektai/plateliu-ezero-apzvalgos-aikstele/"><circle cx="242.781" cy="172.560" r="6" fill="#103b2d"/><text x="267.781" y="199.560" font-size="16">Lake Plateliai viewpoint</text></a>
+<a href="https://zemaitijosnp.lt/veikla/pesciujudviraciu-takai/seires-takas/"><circle cx="236.765" cy="157.479" r="6" fill="#103b2d"/><text x="261.765" y="141.479" font-size="16">Šeirė Nature Trail start</text></a>
+<a href="https://zemaitijosnp.lt/veikla/lankytini-objektai/siberijos-apzvalgos-bokstas/"><circle cx="156.671" cy="354.885" r="6" fill="#103b2d"/><text x="131.671" y="393.885" font-size="16">Siberija Viewing Tower</text></a>
+<a href="https://zemaitijosnp.lt/en/expositions/"><circle cx="721.935" cy="355.699" r="6" fill="#103b2d"/><text x="526.935" y="394.699" font-size="16">Cold War Exposition visitor centre</text></a>
+<path d="M42 434H958" stroke="#b9c4b6"/>
+<circle cx="52" cy="470" r="6" fill="#103b2d"/><text x="72" y="476" font-size="16">Real attraction · source-backed point</text>
+<rect x="470" y="454" width="486" height="88" fill="none" stroke="#50715f" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="488" y="483" font-size="17">Plateliai area · Fictional locality</text>
+<text x="488" y="511" font-size="15">No property location or geographic extent is represented.</text>
+<text x="42" y="574" font-size="15">Sources and exact coordinates: MAP.md / verified-map-points.json</text>
+<text x="42" y="598" font-size="15">No basemap, entrance routing, accommodation origin or measured travel claim.</text>
+</g></svg>

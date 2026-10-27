@@ -21,7 +21,9 @@ export function proxy(request: NextRequest) {
   response.cookies.set(localeCookie,locale,{path:'/',sameSite:'lax',secure:request.nextUrl.protocol==='https:',maxAge:31536000});
   response.headers.set('Content-Language',locale);
   response.headers.set('Cache-Control','private, no-store, max-age=0');
-  response.headers.set('Referrer-Policy','no-referrer');
+  // Only public destination pages load OSM tiles, whose policy requires a Referer.
+  // Booking, guest, operator and integration policies remain unchanged.
+  response.headers.set('Referrer-Policy',internal === '/explore' || internal === '/experiences' ? 'strict-origin-when-cross-origin' : 'no-referrer');
   return response;
 }
 export const config = {matcher:['/((?!_next/static|_next/image|favicon.ico).*)']};

@@ -1,0 +1,57 @@
+{
+  "baseline": "acdce08",
+  "preexistingFiles": 565,
+  "changedPreexisting": [
+    "package.json",
+    "DESIGN.md",
+    "tsconfig.tsbuildinfo",
+    "next.config.ts",
+    "package-lock.json",
+    ".impeccable/config.json",
+    ".impeccable/hook.cache.json",
+    "src/proxy.ts",
+    "src/i18n/catalog.ts",
+    "src/i18n/routing.ts",
+    "src/app/public-ui/shell.tsx"
+  ],
+  "missingPreexisting": [],
+  "protected": [
+    {
+      "path": "next-env.d.ts",
+      "sha256": "0f70629890b72a0a82e91972cc032c04b658b26c265373cb711cf576bfbf8fcc",
+      "unchanged": true
+    },
+    {
+      "path": "ACCOMMODATION_MANAGEMENT_SPEC.md",
+      "sha256": "ca18bf69b45a52007247f669742fbcd706af67a20d0ac32c9c274f61eb2a6187",
+      "unchanged": true
+    },
+    {
+      "path": "owner-accommodation-management-docs-fixed.patch",
+      "sha256": "2e13da7346654866d462981def2f31349b7790f4c2d8169ad066632c662bd0e7",
+      "unchanged": true
+    },
+    {
+      "path": "owner-accommodation-management-docs.patch",
+      "sha256": "feccd3d7ac5264d39f83e0c08e6c024572b8a2b3306c5102e15a261b249665bf",
+      "unchanged": true
+    },
+    {
+      "path": ".impeccable/build/state.json",
+      "sha256": "61e93c47dede7caa3e73227627c97457d86003ca39d931097553f1876d9a4659",
+      "unchanged": true
+    },
+    {
+      "path": ".impeccable/design.json",
+      "sha256": "803da13f318ebb8c14fb5c58ce525c051c22a0ea558cf83a5dc2d8e3905a9a40",
+      "unchanged": true
+    },
+    {
+      "path": ".impeccable/public-design.json",
+      "sha256": "4e74dc1e0c3a57c798eef6dc2c8b84c9fa25747d0b5802519f3033ff7d9ef650",
+      "unchanged": true
+    }
+  ],
+  "phaseAChanged": [],
+  "oldBuildOrMocksChanged": []
+}

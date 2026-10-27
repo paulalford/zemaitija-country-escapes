@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "approved": false,
+  "status": "pending user selection and independent ChatGPT review",
+  "date": "2026-10-27",
+  "tool": "built-in OpenAI imagegen",
+  "artifactType": "paired desktop and portrait mobile review composition; not viewport screenshots",
+  "dimensions": {
+    "width": 1024,
+    "height": 1536
+  },
+  "prompt": "Correct this Cultural Journey desktop/mobile board with minimal changes. Keep layout, imagery, palette and all separate destination links. Restore the disclosure band under BOTH headers with exact text 'Fictional portfolio demo · No real bookings'. In the opening replace 'In Žemaitija, forests, lakes and small towns hold stories of faith, craft and resilience' with 'Explore Žemaitija and a major excursion to the Hill of Crosses in Šiauliai district.' This qualifies geography before the sacred-site illustration. Replace 'Around Plateliai' paragraph with only 'Lakes, woodland and manor parkland.' DELETE 'year-round' and 'close to your stay' everywhere. Make Samogitian Village Museum's location explicitly 'Telšiai' under its name. Make Beržoras subtitle 'Wooden sacred architecture', not generic traditional homesteads. On the bottom map DELETE the Hill of Crosses dot; use plain text 'Hill of Crosses · Šiauliai district →' at the east edge with no pin. Keep the dashed fictional locality and not-for-navigation map caption. Use Arial/Helvetica for body and controls, display serif only headings. Keep visible mobile booking/language links, all adjacent AI illustration captions, and footer independent-destination disclosure. Do not add any new facts or text.",
+  "initialPrompt": "Create a high-fidelity website design review board for Žemaitija Country Escapes: a complete long desktop page on the left and its independently reflowed narrow portrait mobile page on the right, both fully readable, edge-to-edge screens without device frames. Reference image supplies ONLY the approved Timber Index chrome, forest #103b2d, paper #faf8f0, Cormorant Garamond display serif and Arial supporting type, fine rules and flat square sections; do not copy the accommodation hero or its content. Header: brand, Stays, Explore, Check availability, Lietuvių / English / Deutsch; mobile wraps these as visible links. Visible disclosure: 'Fictional portfolio demo · No real bookings'. Guest job: discover real destinations and return to choosing a fictional stay. English review copy. No prices, hours, distances, route lines, property pins, testimonials or badges. Every image has adjacent opaque caption 'AI illustration · Not documentary photography'. Every map says 'Schematic review map · Not for navigation'; legend uses filled dots for real places, broad dashed region for 'Plateliai area · Fictional locality, no property location'. No house icon or centre pin. Footer: 'Independent destinations; no tours sold here.' and 'Compare stays' / 'Check availability'. Concept B — Cultural Journey. Cultural essay leads: dramatic large serif 'Places that carry memory.' beside an unusually tall, clearly illustrated editorial image of a low hill densely covered with varied wooden crosses under a pale northern sky. The title 'Hill of Crosses / Kryžių kalnas' and 'Major excursion · Šiauliai district' appear prominently beside it, with 'Faith, remembrance and resistance' and 'Official visitor information'. No claim this is uniquely Samogitian heritage. The story then unfolds as unequal ruled chapters: 'Timber and tradition' with Beržoras and Samogitian Village Museum; 'Art and regional identity' with Telšiai, Alka and Mykolas Oginskis Palace; 'Pilgrimage' with Žemaičių Kalvarija. Quiet final map band links these places, says schematic, and distinguishes locality zone from attraction dots. Local lakes and Šeirė Nature Trail remain in a visible 'Around Plateliai' list. 'Return to a countryside stay' leads to Compare stays and Check availability. Mobile retains the early booking link, then full Hill of Crosses heading and image, then chapters and map. Editorial pacing, no equal cards.",
+  "firstRefinementPrompt": "Refine this desktop/mobile Cultural Journey review board preserving its strong cultural-essay composition, large cross-covered-hill illustration, forest/paper Timber Index identity and distinct mobile flow. Remove factual errors and unverified editorial filler: delete every 'Alka hill' reference. Alka is a museum at Muziejaus g. 31 in Telšiai. Replace the Art chapter text EXACTLY: 'Telšiai and Samogitian Museum Alka explore regional history and culture. Mykolas Oginskis Palace houses the Samogitian Art Museum in Plungė.' Separate these as clear distinct linked destinations. Timber chapter has separate Beržoras and Samogitian Village Museum links; no suggestion both places share one name/location. Every picture caption must say 'AI illustration · Not documentary photography'. Change local list to Lake Plateliai / Šeirė Nature Trail / Plateliai Manor Park, remove Ilgis and Babrungas filler. Replace the geographically wrong detailed map with a quiet clearly schematic TWO-LOCALITY overview: a broad dashed 'Plateliai area · Fictional locality, no property location' zone at left and 'Hill of Crosses · Šiauliai district' far to the east, no roads/routes/borders, no individual fictional-property marker. Label 'Schematic concept · Not for navigation'. Mobile header must visibly wrap Stays / Explore / Check availability and Lietuvių / English / Deutsch; remove hamburger. Add Check availability before the main illustration. Add a genuine page heading 'Explore Žemaitija' and keep 'Places that carry memory' as its cultural introduction. Preserve a prominent Hill of Crosses feature, label 'Major excursion · Šiauliai district', and sober faith/remembrance text. No invented dates, thousands counts, amenities, accessibility or travel promises. Footer keeps independent-destination disclaimer and Compare stays / Check availability.",
+  "referenceImages": [
+    ".impeccable/mocks/m17-phase-a/b-refinement-1.png"
+  ],
+  "lineage": [
+    {
+      "stage": "initial",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-9b3c0056-d7c7-4607-b648-2f561ee063bc.png",
+      "reference": ".impeccable/review/m16/en-home-1440.png"
+    },
+    {
+      "stage": "first refinement",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-c12e48de-7e0b-46f5-a58c-76d175ab03a2.png",
+      "reference": ".impeccable/mocks/m17-phase-a/b-cultural-journey.png"
+    },
+    {
+      "stage": "final refinement",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-7bbb1655-06ab-409e-af2b-6fc67a45dcff.png",
+      "reference": ".impeccable/mocks/m17-phase-a/b-refinement-1.png"
+    }
+  ],
+  "sourceSha256": "ea476abada90e53486f48603e0734c394167f598e7ea524eb8d523ef69686dc0",
+  "sha256": "8bb0519b2f98814e8c1884373c2d9125993459c57a71a22efbefe37aad209c58",
+  "licensingStatus": "No third-party photographs copied. Generated concept only; no production-image clearance or exclusive ownership claimed.",
+  "geography": "Map pixels are conceptual; use MAP.md and source-backed coordinate evidence. No accommodation coordinates.",
+  "imagery": "AI-generated illustrative arrangements, not documentary depictions of named attractions.",
+  "productionTypography": "Existing Cormorant Garamond / Arial system remains authoritative; raster lettering is approximate."
+}

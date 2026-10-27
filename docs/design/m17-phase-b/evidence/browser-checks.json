@@ -1,0 +1,383 @@
+{
+  "browser": "Headless Microsoft Edge / Chromium",
+  "textScaling": "CSS root text size, not browser zoom",
+  "cases": [
+    {
+      "locale": "en",
+      "route": "explore",
+      "width": 1440,
+      "scale": 100,
+      "status": 200,
+      "dimensions": {
+        "viewport": 1440,
+        "document": 1440
+      },
+      "file": "en-explore-1440-100.png",
+      "mapStatus": "Some map tiles could not load. Use the destination list; points do not provide travel directions."
+    },
+    {
+      "locale": "en",
+      "route": "experiences",
+      "width": 1440,
+      "scale": 100,
+      "status": 200,
+      "dimensions": {
+        "viewport": 1440,
+        "document": 1440
+      },
+      "file": "en-experiences-1440-100.png",
+      "mapStatus": "Map ready. Choose a destination from the list or a labelled marker."
+    },
+    {
+      "locale": "en",
+      "route": "explore",
+      "width": 390,
+      "scale": 100,
+      "status": 200,
+      "dimensions": {
+        "viewport": 390,
+        "document": 390
+      },
+      "file": "en-explore-390-100.png",
+      "mapStatus": "Map ready. Choose a destination from the list or a labelled marker."
+    },
+    {
+      "locale": "en",
+      "route": "experiences",
+      "width": 390,
+      "scale": 100,
+      "status": 200,
+      "dimensions": {
+        "viewport": 390,
+        "document": 390
+      },
+      "file": "en-experiences-390-100.png",
+      "mapStatus": "Map ready. Choose a destination from the list or a labelled marker."
+    },
+    {
+      "locale": "lt",
+      "route": "explore",
+      "width": 768,
+      "scale": 100,
+      "status": 200,
+      "dimensions": {
+        "viewport": 768,
+        "document": 768
+      },
+      "file": "lt-explore-768-100.png",
+      "mapStatus": "Žemėlapis paruoštas. Vietą galite pasirinkti sąraše arba pažymėtu tašku."
+    },
+    {
+      "locale": "lt",
+      "route": "experiences",
+      "width": 768,
+      "scale": 100,
+      "status": 200,
+      "dimensions": {
+        "viewport": 768,
+        "document": 768
+      },
+      "file": "lt-experiences-768-100.png",
+      "mapStatus": "Žemėlapis paruoštas. Vietą galite pasirinkti sąraše arba pažymėtu tašku."
+    },
+    {
+      "locale": "de",
+      "route": "explore",
+      "width": 390,
+      "scale": 200,
+      "status": 200,
+      "dimensions": {
+        "viewport": 390,
+        "document": 390
+      },
+      "file": "de-explore-390-200.png",
+      "mapStatus": "Karte bereit. Wählen Sie ein Ziel in der Liste oder über eine beschriftete Markierung."
+    },
+    {
+      "locale": "de",
+      "route": "experiences",
+      "width": 390,
+      "scale": 200,
+      "status": 200,
+      "dimensions": {
+        "viewport": 390,
+        "document": 390
+      },
+      "file": "de-experiences-390-200.png",
+      "mapStatus": "Karte bereit. Wählen Sie ein Ziel in der Liste oder über eine beschriftete Markierung."
+    }
+  ],
+  "pageErrors": [],
+  "tileResponses": [
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4591/2548.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4594/2548.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4591/2550.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4594/2549.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4594/2550.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4593/2550.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4592/2549.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4592/2550.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4593/2549.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4591/2549.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4593/2548.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4594/2549.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4592/2548.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4591/2548.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4594/2548.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4594/2550.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/13/4591/2550.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/637.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1148/636.png"
+    },
+    {
+      "status": 200,
+      "url": "https://tile.openstreetmap.org/11/1147/636.png"
+    }
+  ],
+  "keyboard": {
+    "listSpaceSelection": true,
+    "markerEnterSelection": true,
+    "selectedContextInUrl": true,
+    "focusStyle": "solid",
+    "equivalentLanguageContext": true,
+    "focusAfterMap": {
+      "tag": "A",
+      "text": "OpenStreetMap contributors"
+    },
+    "accessibleMarkerButtons": [
+      {
+        "name": "Aussichtspunkt am Plateliai-See",
+        "role": "button"
+      },
+      {
+        "name": "Start des Šeirė-Pfads",
+        "role": "button"
+      },
+      {
+        "name": "Aussichtsturm Siberija",
+        "role": "button"
+      },
+      {
+        "name": "Besucherzentrum der Ausstellung zum Kalten Krieg",
+        "role": "button"
+      },
+      {
+        "name": "Aussichtspunkt am Plateliai-See",
+        "role": "button"
+      },
+      {
+        "name": "Start des Šeirė-Pfads",
+        "role": "button"
+      },
+      {
+        "name": "Aussichtsturm Siberija",
+        "role": "button"
+      },
+      {
+        "name": "Besucherzentrum der Ausstellung zum Kalten Krieg",
+        "role": "button"
+      }
+    ],
+    "tabExit": {
+      "verified": true,
+      "steps": 4,
+      "focus": {
+        "tag": "A",
+        "text": "© OpenStreetMap contributors"
+      }
+    }
+  },
+  "fallback": {
+    "emptyFilters": true,
+    "simulatedTileFailure": true,
+    "javascriptDisabledDirectory": true
+  }
+}

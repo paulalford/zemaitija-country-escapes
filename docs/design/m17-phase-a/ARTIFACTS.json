@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-27",
+  "approved": false,
+  "scope": "Review artifacts only; Phase B blocked pending user approval",
+  "selfHashExcluded": true,
+  "files": [
+    {
+      "file": "DESTINATIONS.md",
+      "bytes": 12781,
+      "sha256": "f07b83079359634d64b2802e2deccfcaf60117323880cb572bfe355b690dc623"
+    },
+    {
+      "file": "IMAGE_PROVENANCE.md",
+      "bytes": 6198,
+      "sha256": "148bddc93c44c098c11ccc0e8498d1b5a024df1bb32c31355ad13c6ab5b3b69d"
+    },
+    {
+      "file": "MAP.md",
+      "bytes": 5500,
+      "sha256": "9a009b8dd47158b03f3413a7493cf08a7fb9e1db2595b54b4636fce2b3d25430"
+    },
+    {
+      "file": "README.md",
+      "bytes": 1828,
+      "sha256": "e481dc6dcfe9ba2dd13a21673d9c44dacbc39995e08d97965b523033281f79a5"
+    },
+    {
+      "file": "REVIEW.md",
+      "bytes": 7556,
+      "sha256": "1cd7a3702f34a174c725dc7f2355137ad0276bf20f8ad9f94ca874042decdea5"
+    },
+    {
+      "file": "REVIEW_HANDOVER.md",
+      "bytes": 8458,
+      "sha256": "8b8517a10fc4d24dd674e7eb1bbf40dfb9bc7f12a02399273a2acc4744a3f81f"
+    },
+    {
+      "file": "a-landscape-atlas.png",
+      "bytes": 2085767,
+      "sha256": "6fa89aa3c0fdd6f8edc886e06b4e762e1ef1920b8cee0b542fa47ecf26f78a3a"
+    },
+    {
+      "file": "a-landscape-atlas.png.json",
+      "bytes": 7436,
+      "sha256": "180149407d746bd70fe7b67170dd174eb7b15d6e73995fb39671478561ca5ded"
+    },
+    {
+      "file": "b-cultural-journey.png",
+      "bytes": 2427172,
+      "sha256": "8bb0519b2f98814e8c1884373c2d9125993459c57a71a22efbefe37aad209c58"
+    },
+    {
+      "file": "b-cultural-journey.png.json",
+      "bytes": 7489,
+      "sha256": "fa2ceb1a2bd4e7dff12673954ee4fe862e5711c5400d03e4c055f874c91d182a"
+    },
+    {
+      "file": "c-regional-field-guide.png",
+      "bytes": 2122389,
+      "sha256": "a7035c35c176c99fc50f9243430b9c8936b38342b6d94db30677a4a1b7b3bc28"
+    },
+    {
+      "file": "c-regional-field-guide.png.json",
+      "bytes": 8371,
+      "sha256": "40b6076af19327b200eaa0eb3cb917ca08ab9d69d81542abca3f370b958655eb"
+    },
+    {
+      "file": "map-reference.svg",
+      "bytes": 2501,
+      "sha256": "6cff59c229f8a34d76492936e64e64db338223937775011c00fb10529a1b9a26"
+    },
+    {
+      "file": "verified-map-points.json",
+      "bytes": 1084,
+      "sha256": "17512c837e7f35675c0df4c76b1bb3b39d99fd80186f04b9a50d6bf12b0a443b"
+    }
+  ]
+}

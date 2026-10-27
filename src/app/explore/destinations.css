@@ -1,0 +1,76 @@
+/* Landscape Atlas extends the public Timber Index only. */
+.destination-main{max-width:1600px;margin:auto;overflow-wrap:anywhere;hyphens:auto}
+.destination-main :where(h1,h2,h3,p,span,strong,small,a,button,select){min-width:0}
+.landscape-opening{display:grid;grid-template-columns:minmax(0,36%) minmax(0,64%)}
+.landscape-intro{padding:clamp(24px,4vw,64px) clamp(20px,3vw,48px)}
+.timber .landscape-intro h1{font-size:clamp(3.5rem,6vw,6rem);line-height:.98}
+.timber .landscape-intro h2{font-size:clamp(1.65rem,2.5vw,2.4rem);line-height:1.2;margin-top:1.75rem}
+.destination-photo{margin:0;background:var(--forest);color:var(--paper);display:flex;flex-direction:column}
+.destination-photo img{display:block;width:100%;object-fit:cover;flex:1;min-height:0}
+.destination-photo-lake img{height:100%;max-height:560px;aspect-ratio:1.65;object-position:center 36%}
+.timber .destination-photo figcaption{font-size:.875rem;line-height:1.6;padding:.7rem 1rem;background:var(--forest);color:var(--paper);overflow-wrap:anywhere}
+.timber .destination-photo :focus-visible,.hill-feature :focus-visible{outline-color:#f2ca8b}
+.destination-disclaimer{padding:1rem 4%;max-width:none!important;margin:0!important;border-bottom:1px solid var(--rule);font-size:.95rem}
+.destination-atlas{padding:3rem 4%;border-bottom:1px solid var(--rule)}
+.atlas-heading{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:1.5rem;align-items:start}
+.atlas-layout{display:grid;grid-template-columns:minmax(0,62%) minmax(0,38%);gap:2rem}
+.atlas-map-column{background:#f0eee3;padding:1.25rem;align-self:start}
+.timber .map-status{margin:1rem 0;font-size:1rem}
+.atlas-map{height:420px;height:clamp(320px,38vw,520px);width:100%;isolation:isolate;font-family:Arial,Helvetica,sans-serif}
+.atlas-map .leaflet-control-attribution{font-size:.875rem;background:#faf8f0;color:#16382e;padding:.2rem .5rem;max-width:100%;white-space:normal}
+.atlas-map .leaflet-bar{box-shadow:none;border:1px solid #748879}
+.atlas-map .leaflet-bar a{background:#faf8f0;color:#103b2d;width:48px;height:48px;line-height:48px;font-size:1.5rem}
+.atlas-map .leaflet-marker-icon{display:flex;align-items:center;justify-content:center;border:2px solid #faf8f0;border-radius:50%;background:#103b2d;color:#faf8f0;font-weight:700;font-size:1rem}
+.atlas-map .leaflet-marker-icon.marker-viewpoint{border-radius:3px;background:#315b79}
+.atlas-map .leaflet-marker-icon.marker-history{border-radius:3px;background:#873c29}
+.atlas-map .leaflet-marker-icon.is-selected{outline:3px solid #a95426;outline-offset:3px}
+.timber .atlas-map :focus-visible{outline:3px solid #a95426;outline-offset:3px}
+.timber .map-credit{font-size:.875rem;margin:.75rem 0}
+.timber .locality-note{margin:1.25rem 0 0;padding-top:1rem;border-top:1px solid var(--rule)}
+.timber .atlas-list-column h3{font-size:2rem;line-height:1.15}
+.atlas-site-list{padding:0;margin:0;list-style:none}
+.atlas-site-list li{border-top:1px solid var(--rule);padding:.5rem 0 .8rem}
+.timber .atlas-site-list button{display:flex;width:100%;justify-content:flex-start;text-align:left;background:transparent;border:0;border-radius:0;color:var(--ink);padding:.65rem .25rem;font-weight:400}
+.timber .atlas-site-list button:hover,.timber .atlas-site-list button[aria-pressed=true]{background:#e4e9dc}
+.marker-number{display:inline-flex;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;flex:none;border-radius:50%;background:#103b2d;color:#faf8f0;font:600 1rem Arial,Helvetica,sans-serif}
+.marker-number.marker-viewpoint{background:#315b79;border-radius:3px}.marker-number.marker-history{background:#873c29;border-radius:3px}
+.atlas-source-link{display:inline-block;margin-left:3rem;padding:.2rem 0;min-height:44px;line-height:1.6}
+.timber .selection-status{margin:1rem 0;font-size:.95rem}
+.atlas-selected{border-top:1px solid var(--rule);padding-top:1rem}
+.hill-feature{display:grid;grid-template-columns:1fr 1fr;background:var(--forest);color:var(--paper)}
+.hill-copy{padding:3rem clamp(20px,4vw,64px)}
+.timber .hill-copy h2{font-size:clamp(3rem,5vw,5rem)}
+.timber .excursion-qualifier{font-weight:600;margin:.75rem 0 1.5rem}
+.timber .hill-copy h3{font-size:clamp(2rem,3vw,3rem);line-height:1.12;max-width:16ch}
+.hill-feature .destination-photo img{max-height:600px;aspect-ratio:1.2;object-position:50% 68%}
+.hill-copy .text-link{padding:.75rem 0;display:inline-flex;align-items:center;gap:1rem;min-height:48px;max-width:100%}
+.hill-copy .text-link span{overflow-wrap:anywhere}
+.destination-entry a,.atlas-source-link,.atlas-selected a{overflow-wrap:anywhere;max-width:100%}
+.wider-discovery{display:grid;grid-template-columns:34% 1fr;gap:3rem;padding:3rem 4%}
+.wider-index a{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 0;border-top:1px solid var(--rule);text-decoration:none}
+.wider-index a:hover{text-decoration:underline}.wider-index small{display:block;font-size:1rem;color:var(--muted)}
+.wider-index a span{font:600 clamp(1.6rem,2.5vw,2.2rem)/1.2 Timber Serif,Georgia,serif}
+.destination-stay-return{padding:2.5rem 4%;border-top:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.destination-stay-return>div{display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}.destination-stay-return .text-link{min-height:48px;display:inline-flex;align-items:center;gap:1rem}
+.experiences-heading{padding:3rem 4% 2rem;display:flex;align-items:flex-start;gap:3rem;justify-content:space-between}
+.timber .experiences-heading h2{font-size:2rem}.experiences-heading .button{flex:none}
+.destination-filters{display:grid;grid-template-columns:1fr 1fr auto auto;gap:1.25rem;align-items:end;padding:1.5rem 4%;background:#f0eee3}
+.destination-filters>a{min-height:48px;display:flex;align-items:center}
+.geographic-index{display:flex;flex-wrap:wrap;padding:1rem 4%;gap:1.5rem;border-bottom:1px solid var(--rule)}
+.geographic-index a{display:flex;align-items:center;gap:1rem;min-height:48px}
+.destination-directory{padding:0 4% 3rem}
+.directory-group{padding-top:3rem;scroll-margin-top:1rem}
+.directory-group>div{border-top:1px solid var(--rule)}
+.destination-entry{display:grid;grid-template-columns:minmax(0,34%) minmax(0,1fr);gap:2.5rem;padding:1.5rem 0;border-bottom:1px solid var(--rule);scroll-margin-top:1rem}
+.timber .destination-entry h3{font-size:2rem;line-height:1.15}.timber .destination-entry p{margin:.5rem 0 1rem}.destination-entry a{display:inline-block;min-height:44px;padding:.4rem 0}
+.destination-area,.destination-category,.no-map-point{color:var(--muted)}.destination-category,.no-map-point{font-size:.95rem}
+.directory-hill{background:var(--forest);color:var(--paper);padding:2rem;margin-inline:0}
+.directory-hill .destination-category,.directory-hill .no-map-point{color:#dae2ce}.directory-hill :focus-visible{outline-color:#f2ca8b}
+@media(max-width:1100px){.atlas-layout{grid-template-columns:1fr 1fr}.destination-filters{grid-template-columns:1fr 1fr}.experiences-heading{display:block}.experiences-heading .button{margin-top:1rem}}
+@media(max-width:760px){
+.landscape-opening{grid-template-columns:1fr}.landscape-intro{padding:2rem 1.25rem}.timber .landscape-intro h1{font-size:clamp(3rem,12vw,4.5rem)}.landscape-intro .button{width:100%}.destination-photo-lake img{height:280px;max-height:320px;aspect-ratio:1.6}
+.atlas-heading,.atlas-layout,.hill-feature,.wider-discovery{grid-template-columns:1fr;gap:1.5rem}.destination-atlas,.wider-discovery{padding:2rem 1.25rem}.atlas-map-column{padding:1rem}.atlas-map{height:340px}.atlas-source-link{margin-left:0}.atlas-list-column{margin-top:1rem}.hill-copy{padding:2rem 1.25rem}.hill-feature .destination-photo img{height:320px;max-height:none;aspect-ratio:1.4;object-position:50% 70%}
+.destination-stay-return{display:block;padding:2rem 1.25rem}.destination-stay-return>div{display:grid;gap:1rem}.destination-stay-return .button{width:100%}.experiences-heading{padding:2rem 1.25rem}.destination-filters{padding:1.25rem}.geographic-index{padding:1rem 1.25rem;gap:.5rem}.geographic-index a{width:100%;justify-content:space-between}.destination-directory{padding-inline:1.25rem}.destination-entry{grid-template-columns:1fr;gap:.5rem}.directory-hill{padding:1.5rem}.destination-disclaimer{padding-inline:1.25rem}.directory-group{padding-top:2rem}
+}
+@media(max-width:450px){.destination-filters{grid-template-columns:1fr}.destination-filters button{width:100%}}
+@media(min-width:761px){.destination-photo-crosses{min-height:460px}}

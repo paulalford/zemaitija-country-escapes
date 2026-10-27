@@ -11,7 +11,9 @@ const nextConfig: NextConfig = {
       {key:'X-Robots-Tag',value:'noindex, nofollow'},
       {key:'Content-Security-Policy',value:"default-src 'self'; script-src 'self' 'unsafe-inline'"+(process.env.NODE_ENV==='development'?" 'unsafe-eval'":'')+"; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; form-action 'self' https://checkout.stripe.com "+identityOrigin+"; base-uri 'none'"},
     ];
-    return ['/manage/:path*','/admin/:path*','/api/access/:path*','/api/booking/:path*','/booking/:path*','/accommodations/:path*','/','/:locale(lt|en|de)','/:locale(lt|en|de)/booking/:path*','/:locale(lt|en|de)/accommodations/:path*','/:locale(lt|en|de)/manage/:path*','/:locale(lt|en|de)/admin/:path*'].map(source=>({source,headers}));
+    const destinationHeaders=headers.map(header => header.key==='Referrer-Policy' ? {...header,value:'strict-origin-when-cross-origin'} : header.key==='Content-Security-Policy' ? {...header,value:header.value.replace("img-src 'self' data:","img-src 'self' data: https://tile.openstreetmap.org")} : header);
+    const destinationRoutes=['/explore','/experiences','/:locale(lt|en|de)/explore','/:locale(lt|en|de)/experiences'].map(source=>({source,headers:destinationHeaders}));
+    return [...destinationRoutes, ...['/manage/:path*','/admin/:path*','/api/access/:path*','/api/booking/:path*','/booking/:path*','/accommodations/:path*','/','/:locale(lt|en|de)','/:locale(lt|en|de)/booking/:path*','/:locale(lt|en|de)/accommodations/:path*','/:locale(lt|en|de)/manage/:path*','/:locale(lt|en|de)/admin/:path*'].map(source=>({source,headers}))];
   },
 };
 export default nextConfig;

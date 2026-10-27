@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "approved": false,
+  "status": "pending user selection and independent ChatGPT review",
+  "date": "2026-10-27",
+  "tool": "built-in OpenAI imagegen",
+  "artifactType": "paired desktop and portrait mobile review composition; not viewport screenshots",
+  "dimensions": {
+    "width": 1312,
+    "height": 1199
+  },
+  "prompt": "Correct this Landscape Atlas desktop/mobile review board with minimal changes. Keep composition and all imagery. Both rendered pages need Arial/Helvetica supporting body text and controls; retain Cormorant Garamond-like display serif only for headings. The local list 'In the area' must contain only Lake Plateliai, Šeirė Nature Trail, Beržoras, Siberija Viewing Tower; DELETE Hill of Crosses from that local list. Its large separate green feature remains prominent below. In BOTH overview maps DELETE the filled Hill of Crosses dot and put a plain edge annotation 'Hill of Crosses · Major excursion →' with no point marker, because official coordinates conflict. Replace the oversized dashed Plateliai zone that surrounds Plungė with a small dashed halo ONLY around the Plateliai town label; keep legend 'Fictional locality · No property location' and label 'Schematic concept · Not for navigation'. The halo is conceptual, not a geographic extent. Bottom heading becomes 'Across Žemaitija & major excursions' rather than calling palace and garden major excursions. Names below: Telšiai, Mykolas Oginskis Palace, Kretinga Winter Garden, Palanga. Remove all descriptive bottom prose; names only. Keep the fictional-demo disclosure, visible mobile languages/navigation and early Check availability. All images keep their AI illustration captions. Footer stays complete.",
+  "initialPrompt": "Create a high-fidelity website design review board for Žemaitija Country Escapes: a complete long desktop page on the left and its independently reflowed narrow portrait mobile page on the right, both fully readable, edge-to-edge screens without device frames. Reference image supplies ONLY the approved Timber Index chrome, forest #103b2d, paper #faf8f0, Cormorant Garamond display serif and Arial supporting type, fine rules and flat square sections; do not copy the accommodation hero or its content. Header: brand, Stays, Explore, Check availability, Lietuvių / English / Deutsch; mobile wraps these as visible links. Visible disclosure: 'Fictional portfolio demo · No real bookings'. Guest job: discover real destinations and return to choosing a fictional stay. English review copy. No prices, hours, distances, route lines, property pins, testimonials or badges. Every image has adjacent opaque caption 'AI illustration · Not documentary photography'. Every map says 'Schematic review map · Not for navigation'; legend uses filled dots for real places, broad dashed region for 'Plateliai area · Fictional locality, no property location'. No house icon or centre pin. Footer: 'Independent destinations; no tours sold here.' and 'Compare stays' / 'Check availability'. Concept A — Landscape Atlas. The page opens as a landscape atlas: an expansive low-horizon illustration of wooded lake country, an oversized 'Explore Žemaitija' serif title on a quiet paper margin and short invitation 'Lakes, forests and the places between'. A substantial paper regional map occupies the next spread alongside a short ruled local index: Lake Plateliai, Šeirė Nature Trail, Beržoras, Siberija Viewing Tower. In the map west coast is left, Plateliai upper centre-left, Plungė below it, Telšiai to the east, Hill of Crosses far east near Šiauliai. Dedicated wide editorial feature beneath: 'Hill of Crosses / Kryžių kalnas', 'Major excursion · Šiauliai district', 'A place of faith and remembrance', respectful distant illustrative cross silhouettes, and 'Official visitor information'. Lower ruled links: Telšiai, Oginskis Palace, Kretinga Winter Garden, Palanga. Mobile puts the availability link before the landscape, then map and readable place list, then the full Hill of Crosses feature. Distinctive atlas hierarchy, no ornamental card grid.",
+  "firstRefinementPrompt": "Edit this desktop/mobile website review board, preserving the atlas composition, portrait mobile column, Timber Index typography and forest/paper palette. Important factual corrections: remove the Šeirė Nature Trail dot from BOTH regional maps entirely; it is a local trail by Plateliai, not southeast near Plungė. Keep only verified town names Plateliai, Plungė, Telšiai, Kretinga, Palanga and a Hill of Crosses label east near Šiauliai on regional overview. Replace all detailed map roads and apparent precise borders with simple quiet geographic context. Label each map 'Schematic concept · Locations require verification' and keep the dashed broad Plateliai area labelled 'Fictional locality · No property location'; no centre house marker. Replace the fade of white into the hero photo with a crisp rectangular edge. Mobile must show visible Stays / Explore / Check availability links and language links, no hamburger. Keep strong early Check availability. Remove unverified supporting prose and use exact concise text: Lake Plateliai: 'Lake country in Žemaitija National Park.' Šeirė Nature Trail: 'A trail through forest and wetland.' Beržoras: 'Wooden sacred architecture.' Siberija Viewing Tower: 'Views over lakes and wetland.' Hill of Crosses: 'A place of faith and remembrance. Major excursion · Šiauliai district.' Make this feature title large serif not tiny uppercase eyebrow. Lower regional labels Telšiai, Mykolas Oginskis Palace, Kretinga Winter Garden; move Palanga to 'Major excursions' alongside Hill of Crosses, not a Samogitian-heritage label. Keep every opaque 'AI illustration · Not documentary photography' caption and the fictional-demo disclosure. Give complete legible desktop and mobile page compositions, no truncated footer.",
+  "referenceImages": [
+    ".impeccable/mocks/m17-phase-a/a-refinement-1.png"
+  ],
+  "lineage": [
+    {
+      "stage": "initial",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-814717d8-64de-4598-8bb4-f5ffc908ac24.png",
+      "reference": ".impeccable/review/m16/en-home-1440.png"
+    },
+    {
+      "stage": "first refinement",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-ff92d565-9f4b-44a0-9b27-39f6d40794a6.png",
+      "reference": ".impeccable/mocks/m17-phase-a/a-landscape-atlas.png"
+    },
+    {
+      "stage": "final refinement",
+      "output": "/home/paul/.codex/generated_images/01a17e4b-c014-7e61-88f1-dac55fb9de00/exec-e8638a90-bab1-486b-9eea-1cfc28f96eef.png",
+      "reference": ".impeccable/mocks/m17-phase-a/a-refinement-1.png"
+    }
+  ],
+  "sourceSha256": "0459543a8ce14d74dfc062854dfc7db848461ae4c50c06e6dfa08b48c1949eb8",
+  "sha256": "6fa89aa3c0fdd6f8edc886e06b4e762e1ef1920b8cee0b542fa47ecf26f78a3a",
+  "licensingStatus": "No third-party photographs copied. Generated concept only; no production-image clearance or exclusive ownership claimed.",
+  "geography": "Map pixels are conceptual; use MAP.md and source-backed coordinate evidence. No accommodation coordinates.",
+  "imagery": "AI-generated illustrative arrangements, not documentary depictions of named attractions.",
+  "productionTypography": "Existing Cormorant Garamond / Arial system remains authoritative; raster lettering is approximate."
+}

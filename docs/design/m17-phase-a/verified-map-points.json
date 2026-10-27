@@ -1,0 +1,34 @@
+{
+  "researchDate": "2026-10-27",
+  "crs": "WGS84",
+  "coordinateOrder": "latitude, longitude",
+  "purpose": "Phase A source evidence, not production data",
+  "accommodationGeometry": null,
+  "hillOfCrossesPinStatus": "blocked: official sources disagree",
+  "points": [
+    {
+      "name": "Lake Plateliai viewpoint",
+      "latitude": 56.04704,
+      "longitude": 21.828335,
+      "source": "https://zemaitijosnp.lt/veikla/lankytini-objektai/plateliu-ezero-apzvalgos-aikstele/"
+    },
+    {
+      "name": "Šeirė Nature Trail start",
+      "latitude": 56.048411,
+      "longitude": 21.827357,
+      "source": "https://zemaitijosnp.lt/veikla/pesciujudviraciu-takai/seires-takas/"
+    },
+    {
+      "name": "Siberija Viewing Tower",
+      "latitude": 56.030465,
+      "longitude": 21.814336,
+      "source": "https://zemaitijosnp.lt/veikla/lankytini-objektai/siberijos-apzvalgos-bokstas/"
+    },
+    {
+      "name": "Cold War Exposition visitor centre",
+      "latitude": 56.030391,
+      "longitude": 21.906232,
+      "source": "https://zemaitijosnp.lt/en/expositions/"
+    }
+  ]
+}
