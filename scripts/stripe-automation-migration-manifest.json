@@ -1,0 +1,293 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792762291251,
+      "tag": "0000_amused_gargoyle",
+      "breakpoints": true,
+      "sha256": "e8b552abec50c3bd0d88b7b0045728f37fa2074955fdae27ce5b9389e271e4ad"
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792762302824,
+      "tag": "0001_invariants",
+      "breakpoints": true,
+      "sha256": "4de029c2068b5ae55b9c405461d24e86419f8a422c54c680b7488d327a3101d2"
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792762302825,
+      "tag": "0002_allocation_parent_guards",
+      "breakpoints": true,
+      "sha256": "b6d60a0881d5bc16f4681bd11803187869c9ffc057d23dbd0d89b52ad508a5a0"
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792762600575,
+      "tag": "0003_evidence_indexes",
+      "breakpoints": true,
+      "sha256": "c74d2c66fd3f497f1a5cbc1b98307e1d0178c10185cb4b38614b0fd4d5be4c39"
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792764137058,
+      "tag": "0004_refund_obligation_fk",
+      "breakpoints": true,
+      "sha256": "b93505a348134c6b30dead29afc688460667ef11fe05a04f067593c5cd83925c"
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792766194812,
+      "tag": "0005_active_tariff_guard",
+      "breakpoints": true,
+      "sha256": "d65854726d1858989b7ec6a886ca6fd2f58ec9304205532623fffd03fd5367e5"
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792830623526,
+      "tag": "0006_pending_booking_guards",
+      "breakpoints": true,
+      "sha256": "7780e05ad769e9d1e4923923c9fde0e8045391e23a140a07c064bdc5241b1b46"
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792830716527,
+      "tag": "0007_pending_guard_repairs",
+      "breakpoints": true,
+      "sha256": "117338a99875708b6d19409c74dc0cdbacb6554fdbba76a1748509dcc7774e1e"
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792830744183,
+      "tag": "0008_hold_transition_compatibility",
+      "breakpoints": true,
+      "sha256": "d49fd7af4b70506722b1b4de1c44740a8f26dfe8842d1fed27b9ab7b74c590cf"
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792830816512,
+      "tag": "0009_accepted_write_guards",
+      "breakpoints": true,
+      "sha256": "50f0396197640490a7773cce60afa132ba7bb87941ec4783810d9b97de82b34b"
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792830891987,
+      "tag": "0010_acceptance_role_reads",
+      "breakpoints": true,
+      "sha256": "ed51af07e10a3d5fbac31c76197f1f2a1f8671eb8bd2ae445a579fc1844aefe4"
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792830963930,
+      "tag": "0011_acceptance_lock_capability",
+      "breakpoints": true,
+      "sha256": "031cbf6e515e9d9cdabb9172de8a475c05edd436e23e1d0d19475ef91591b73d"
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792831078103,
+      "tag": "0012_pending_state_consistency",
+      "breakpoints": true,
+      "sha256": "c2c3a58e42da25d5a316e03f89ac0a99e299ecc2dbc1884a0a4b604c6b4a3b28"
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792831176240,
+      "tag": "0013_restrict_pending_role_updates",
+      "breakpoints": true,
+      "sha256": "546512e3b69fd8beae991f716a31abdd8e6c672ba5ea697ef37464d452b417c0"
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792868583947,
+      "tag": "0014_accepted_pending_integrity",
+      "breakpoints": true,
+      "sha256": "15278b5d8ba0aa9484b37b62cad55ed17f029c29ef944f60601809ffdf19963e"
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792868918707,
+      "tag": "0015_predispatch_command_state_fence",
+      "breakpoints": true,
+      "sha256": "a0f28c7c5b511c17f8102c699f76e56f83e9221001bcfa1860f09758281f8923"
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792868990903,
+      "tag": "0016_accepted_command_history",
+      "breakpoints": true,
+      "sha256": "3a5b1bb3b857e6d0260107cc6dbcdb2276fa1dcb65e6b7384bef6bf474a11666"
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792871009015,
+      "tag": "0017_stripe_initial_fields",
+      "breakpoints": true,
+      "sha256": "53ebcd0ce9bb2a26314189a6bd2c1f87cf562372b14aa079862daf22cac94284"
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792871013481,
+      "tag": "0018_stripe_initial_guards",
+      "breakpoints": true,
+      "sha256": "eb40675dd38b9d60a60b8a283b95005c9392b52cef89798b9f477c0f3eb3f6f2"
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792873037547,
+      "tag": "0019_webhook_recovery_inbox",
+      "breakpoints": true,
+      "sha256": "d52753973ac35ca4f81ed20910176807a97a0651666a215e8e1e51e6293720fe"
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792925386966,
+      "tag": "0020_allocation_parent_lock_privilege",
+      "breakpoints": true,
+      "sha256": "c1d522f3cbd64092d3e7db9b6f3c8080da283c8ce54c039bde9701578e18ac55"
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792925386967,
+      "tag": "0021_balance_attempt_guards",
+      "breakpoints": true,
+      "sha256": "e9aa2c1f9d1c21436e12f0d511fa11150a3eea4bf618199f65645b2936a15635"
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792925386968,
+      "tag": "0022_nonpayment_jobs",
+      "breakpoints": true,
+      "sha256": "96d9df62ba3ecc21701700fe48c38dab1e49e9c51ccdce60a0bcf9c0aebbdb7e"
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792925386969,
+      "tag": "0023_nonpayment_release_guard",
+      "breakpoints": true,
+      "sha256": "512c2ee76177ec2c2e274161e254e4b560a9cc4dee4a6e1610ffb6f3d801f40e"
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792925386970,
+      "tag": "0024_nonpayment_financial_guard",
+      "breakpoints": true,
+      "sha256": "ac482c4bcb1289d3f332519b1e6c493fa9067e7b3c9ac16d21effe496f82c60b"
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792925386971,
+      "tag": "0025_nonpayment_late_capture",
+      "breakpoints": true,
+      "sha256": "78c763b10ed312d79b452c5abc70b460a16251eadd56047713fd30a7a8e4397f"
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792925386972,
+      "tag": "0026_cancellation_refunds",
+      "breakpoints": true,
+      "sha256": "de606fa599234f23ffdb1540cc4dc0fca6583cec07ab4b652ca6d8a8e63d9811"
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792925386973,
+      "tag": "0027_cancellation_financial_guards",
+      "breakpoints": true,
+      "sha256": "6748482056e7216fe807ee11bbf79ef604018f4efd32b3852c00cc561dd45bac"
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792925386974,
+      "tag": "0028_cancellation_trigger_row_shape",
+      "breakpoints": true,
+      "sha256": "0af1dd245bf1fbe659ea69f17333cb51010c981b4ff1d3b052028d9606fae8ac"
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792951829965,
+      "tag": "0029_access_management",
+      "breakpoints": true,
+      "sha256": "e9da7c2a8807233adf53f45fabbf2ef9fc7b89c59cb3f064125d7e0a3428df21"
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1792952468552,
+      "tag": "0030_managed_claim_guards",
+      "breakpoints": true,
+      "sha256": "395d4245114b3577adcb67f30340838c6a27a2638712f4c0dc3b229b64b827fd"
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792952764518,
+      "tag": "0031_identity_lock_capability",
+      "breakpoints": true,
+      "sha256": "716e08dea288c2edae26be3811de9c1a70fa8c055ccee029251ed6b27816bc6c"
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792953166697,
+      "tag": "0032_identity_authorization_guard",
+      "breakpoints": true,
+      "sha256": "8d04894afe04c988972ecb53f6168050833e233b247e9e0b2ad9bbef77142755"
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792988290072,
+      "tag": "0033_guest_access_revocation_boundary",
+      "breakpoints": true,
+      "sha256": "11a3d00517a4b34720d55c0a0f11f207b65556242f23405bae5c2693084737f0"
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1793038526264,
+      "tag": "0034_public_synthetic_guest",
+      "breakpoints": true,
+      "sha256": "c592a13ad51352667bf79512662d159484091ef9790d3a3ad3246e4672a69164"
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1793577600000,
+      "tag": "0035_payment_recovery_schedule",
+      "breakpoints": true,
+      "sha256": "774c30a4e172c91c014c8c3511a90079f82dca317b1c10786c99ba967baa95bf"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ export type InitialContext = {
   paymentIntentId: string | null;
   commandId: string; commandState: string; idempotencyKey: string;
   requestFingerprint: Buffer; requestParams: unknown; firstSubmittedAt: Date | null;
+  commandNow: Date; nextAttemptAt: Date | null; commandAttempts: number;
   leaseGeneration: bigint; leaseOwner: string | null; leaseExpiresAt: Date | null;
 };
 
@@ -41,13 +42,13 @@ export async function withInitialLock<T>(pool: Pool, attemptId: string,
       attempt_id:string;attempt_state:string;expected_cents:string;obligation_id:string;
       session_id:string|null;checkout_url:string|null;session_expires_at:Date|null;payment_intent_id:string|null;
       command_id:string;command_state:string;idempotency_key:string;request_fingerprint:Buffer;request_params:unknown;
-      first_submitted_at:Date|null;lease_generation:string;lease_owner:string|null;lease_expires_at:Date|null;
+      first_submitted_at:Date|null;command_now:Date;next_attempt_at:Date|null;attempt_count:number;lease_generation:string;lease_owner:string|null;lease_expires_at:Date|null;
     }>(`SELECT b.id booking_id,b.guest_id,b.unit_id,b.status,s.locale,s.split_basis,h.id hold_id,h.state hold_state,
       c.id claim_id,c.hold_id claim_hold_id,c.booking_id claim_booking_id,c.released_at claim_released_at,
       a.id attempt_id,a.state attempt_state,a.expected_cents::text,a.obligation_id,
       a.stripe_session_id session_id,a.checkout_url,a.session_expires_at,a.stripe_payment_intent_id payment_intent_id,
       pc.id command_id,pc.state command_state,pc.stripe_idempotency_key idempotency_key,
-      pc.request_fingerprint,pc.request_params,pc.first_submitted_at,pc.lease_generation::text,
+      clock_timestamp() command_now,pc.request_fingerprint,pc.request_params,pc.first_submitted_at,pc.next_attempt_at,pc.attempt_count,pc.lease_generation::text,
       pc.lease_owner,pc.lease_expires_at
       FROM payment_attempts a JOIN bookings b ON b.id=a.booking_id
       JOIN price_snapshots s ON s.booking_id=b.id JOIN inventory_holds h ON h.id=a.hold_id
@@ -63,7 +64,7 @@ export async function withInitialLock<T>(pool: Pool, attemptId: string,
       sessionId:r.session_id,checkoutUrl:r.checkout_url,sessionExpiresAt:r.session_expires_at,
       paymentIntentId:r.payment_intent_id,commandId:r.command_id,commandState:r.command_state,
       idempotencyKey:r.idempotency_key,requestFingerprint:r.request_fingerprint,requestParams:r.request_params,
-      firstSubmittedAt:r.first_submitted_at,leaseGeneration:BigInt(r.lease_generation),
+      firstSubmittedAt:r.first_submitted_at,commandNow:r.command_now,nextAttemptAt:r.next_attempt_at,commandAttempts:r.attempt_count,leaseGeneration:BigInt(r.lease_generation),
       leaseOwner:r.lease_owner,leaseExpiresAt:r.lease_expires_at};
     const value=await work(client,context);
     await client.query('COMMIT');

@@ -6,8 +6,10 @@ const sdk=vi.hoisted(()=>({
   create:vi.fn<(params:Stripe.Checkout.SessionCreateParams,options:Stripe.RequestOptions)=>Promise<Partial<Stripe.Checkout.Session>>>(),
   account:vi.fn<()=>Promise<{id:string}>>(),
   constructor:vi.fn(),
+  httpClient:vi.fn((fetcher:typeof fetch)=>({fetcher})),
 }));
 vi.mock('stripe',()=>({default:class {
+  static createFetchHttpClient=sdk.httpClient;
   constructor(secret:string,options:unknown) { sdk.constructor(secret,options); }
   accounts={retrieve:sdk.account};
   checkout={sessions:{create:sdk.create}};
@@ -27,6 +29,17 @@ beforeEach(()=>{
 });
 
 describe('Stripe Checkout request parameters',()=>{
+  it('uses the injected bounded transport and explicitly verifies account identity',async()=>{
+    const fetcher=vi.fn(async()=>{throw Error('No network permitted');});
+    const gateway=new StripeSdkGateway(config,{fetch:fetcher});
+    expect(await gateway.verifyAccount()).toBe(config.STRIPE_ACCOUNT_ID);
+    expect(sdk.httpClient).toHaveBeenCalledWith(fetcher);
+    expect(sdk.constructor).toHaveBeenCalledWith(config.STRIPE_SECRET_KEY,{
+      apiVersion:STRIPE_API_VERSION,maxNetworkRetries:0,timeout:10000,httpClient:{fetcher},
+    });
+    expect(sdk.create).not.toHaveBeenCalled();expect(fetcher).not.toHaveBeenCalled();
+    await gateway.createSession(base);expect(sdk.account).toHaveBeenCalledOnce();
+  });
   it.each([
     ['INITIAL_ADVANCE','Synthetic accommodation booking advance',true],
     ['INITIAL_FULL','Synthetic accommodation booking full initial payment',true],

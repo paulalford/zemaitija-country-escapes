@@ -67,10 +67,13 @@ export class StripeSdkGateway implements StripeGateway, RefundGateway {
   readonly accountId: string;
   private readonly stripe: Stripe;
   private accountCheck?: Promise<void>;
-  constructor(private readonly config: StripeConfig) {
+  constructor(private readonly config: StripeConfig, transport?: {fetch:typeof fetch}) {
     this.accountId=config.STRIPE_ACCOUNT_ID;
-    this.stripe=new Stripe(config.STRIPE_SECRET_KEY,{apiVersion:STRIPE_API_VERSION,maxNetworkRetries:0,timeout:10_000});
+    this.stripe=new Stripe(config.STRIPE_SECRET_KEY,{apiVersion:STRIPE_API_VERSION,maxNetworkRetries:0,timeout:10_000,
+      ...(transport?{httpClient:Stripe.createFetchHttpClient(transport.fetch)}:{})});
   }
+  /** Explicit automation guard; construction and configured strings do not attest identity. */
+  async verifyAccount():Promise<string> { await this.assertAccount();return this.accountId; }
   private async assertAccount() {
     this.accountCheck ??= this.stripe.accounts.retrieve(null).then(account => {
       if (account.id !== this.accountId) throw new Error('Stripe test account mismatch');

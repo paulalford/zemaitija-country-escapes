@@ -1,0 +1,65 @@
+# Standalone template. Do not combine with docker-compose.yml. Provisioning is not approved in Stage 2A.
+name: zemaitija-stripe-automation
+services:
+  stripe-automation-db:
+    image: postgres:17.6
+    container_name: zemaitija-stripe-automation-db
+    restart: "no"
+    networks:
+      - stripe_automation_internal
+    environment:
+      POSTGRES_USER: zemaitija_bootstrap
+      POSTGRES_DB: zemaitija_stripe_automation_dev
+      POSTGRES_PASSWORD: ${AUTOMATION_BOOTSTRAP_PASSWORD:?Independent bootstrap password required}
+      APP_DB_USER: zemaitija_app
+      APP_DB_PASSWORD: ${AUTOMATION_APP_PASSWORD:?Independent application password required}
+      MIGRATION_DB_USER: zemaitija_migrator
+      MIGRATION_DB_PASSWORD: ${AUTOMATION_MIGRATION_PASSWORD:?Independent migration password required}
+      # Compare approved fingerprints; never copy protected database passwords into this container.
+      PROTECTED_BOOTSTRAP_SHA256: ${AUTOMATION_PROTECTED_BOOTSTRAP_PASSWORD_SHA256:?Protected credential fingerprint required}
+      PROTECTED_APP_SHA256: ${AUTOMATION_PROTECTED_APP_PASSWORD_SHA256:?Protected credential fingerprint required}
+      PROTECTED_MIGRATION_SHA256: ${AUTOMATION_PROTECTED_MIGRATION_PASSWORD_SHA256:?Protected credential fingerprint required}
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        fail() { echo 'Isolated PostgreSQL credential policy rejected' >&2; exit 1; }
+        [ "$$POSTGRES_DB" = zemaitija_stripe_automation_dev ] || fail
+        [ "$${#POSTGRES_PASSWORD}" -ge 32 ] || fail
+        [ "$${#APP_DB_PASSWORD}" -ge 32 ] || fail
+        [ "$${#MIGRATION_DB_PASSWORD}" -ge 32 ] || fail
+        [ "$$POSTGRES_PASSWORD" != "$$APP_DB_PASSWORD" ] || fail
+        [ "$$POSTGRES_PASSWORD" != "$$MIGRATION_DB_PASSWORD" ] || fail
+        [ "$$APP_DB_PASSWORD" != "$$MIGRATION_DB_PASSWORD" ] || fail
+        for fingerprint in "$$PROTECTED_BOOTSTRAP_SHA256" "$$PROTECTED_APP_SHA256" "$$PROTECTED_MIGRATION_SHA256"; do
+          [ "$${#fingerprint}" -eq 64 ] || fail
+          case "$$fingerprint" in *[!0-9a-f]*) fail ;; esac
+        done
+        for isolated in "$$POSTGRES_PASSWORD" "$$APP_DB_PASSWORD" "$$MIGRATION_DB_PASSWORD"; do
+          case "$$isolated" in change-*|*example*|*placeholder*) fail ;; esac
+          isolated_hash=$$(printf '%s' "$$isolated" | sha256sum)
+          isolated_hash=$${isolated_hash%% *}
+          for protected in "$$PROTECTED_BOOTSTRAP_SHA256" "$$PROTECTED_APP_SHA256" "$$PROTECTED_MIGRATION_SHA256"; do
+            [ "$$isolated_hash" != "$$protected" ] || fail
+          done
+        done
+        unset PROTECTED_BOOTSTRAP_SHA256 PROTECTED_APP_SHA256 PROTECTED_MIGRATION_SHA256
+        exec /usr/local/bin/docker-entrypoint.sh postgres
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - stripe_automation_data:/var/lib/postgresql/data
+      - ./db/init/01-roles.sh:/docker-entrypoint-initdb.d/01-roles.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zemaitija_bootstrap -d zemaitija_stripe_automation_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+volumes:
+  stripe_automation_data:
+    name: zemaitija_stripe_automation_data
+networks:
+  stripe_automation_internal:
+    name: zemaitija-stripe-automation-internal
+    driver: bridge
+    internal: true

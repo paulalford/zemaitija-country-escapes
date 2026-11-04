@@ -1,7 +1,9 @@
 import 'server-only';
+import { recoverPaymentAttempts, type RecoveryOptions } from './payment-recovery';
 import { createHash, randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
 import type { CheckoutRequest, CheckoutSession, PaymentEvidence, StripeGateway } from './stripe-adapter';
+import { commandRetrySeconds, sessionSubmissionGate } from './checkout-command-scheduling';
 import type { CheckoutDispatch } from './checkout-worker';
 
 type BalanceContext = {
@@ -9,6 +11,7 @@ type BalanceContext = {
   expectedCents:bigint; attemptId:string; attemptState:string; sessionId:string|null;
   checkoutUrl:string|null; sessionExpiresAt:Date|null; commandId:string; commandState:string;
   idempotencyKey:string; requestParams:CheckoutRequest|null; firstSubmittedAt:Date|null;
+  commandNow:Date; nextAttemptAt:Date|null; commandAttempts:number;
   leaseGeneration:bigint; leaseOwner:string|null; leaseExpiresAt:Date|null;
 };
 type ReconcileResult='PAID_IN_FULL'|'ALREADY_RECORDED'|'UNALLOCATABLE'|'OPEN'|'EXPIRED'|'FAILED'|'RECONCILING';
@@ -32,11 +35,11 @@ async function withBalanceLock<T>(pool:Pool,attemptId:string,work:(client:PoolCl
       obligation_id:string;expected_cents:string;attempt_id:string;attempt_state:string;session_id:string|null;
       checkout_url:string|null;session_expires_at:Date|null;command_id:string;command_state:string;
       idempotency_key:string;request_params:CheckoutRequest|null;first_submitted_at:Date|null;
-      lease_generation:string;lease_owner:string|null;lease_expires_at:Date|null}>(`SELECT b.id booking_id,b.guest_id,b.unit_id,b.status,s.locale,
+      command_now:Date;next_attempt_at:Date|null;attempt_count:number;lease_generation:string;lease_owner:string|null;lease_expires_at:Date|null}>(`SELECT b.id booking_id,b.guest_id,b.unit_id,b.status,s.locale,
       a.obligation_id,a.expected_cents::text,a.id attempt_id,a.state attempt_state,a.stripe_session_id session_id,
       a.checkout_url,a.session_expires_at,pc.id command_id,pc.state command_state,
       pc.stripe_idempotency_key idempotency_key,pc.request_params,pc.first_submitted_at,
-      pc.lease_generation::text,pc.lease_owner,pc.lease_expires_at
+      clock_timestamp() command_now,pc.next_attempt_at,pc.attempt_count,pc.lease_generation::text,pc.lease_owner,pc.lease_expires_at
       FROM payment_attempts a JOIN bookings b ON b.id=a.booking_id
       JOIN price_snapshots s ON s.booking_id=b.id JOIN provider_commands pc ON pc.payment_attempt_id=a.id AND pc.kind='SESSION_CREATE'
       WHERE a.id=$1`,[attemptId]);
@@ -47,7 +50,7 @@ async function withBalanceLock<T>(pool:Pool,attemptId:string,work:(client:PoolCl
       attemptState:r.attempt_state,sessionId:r.session_id,checkoutUrl:r.checkout_url,
       sessionExpiresAt:r.session_expires_at,commandId:r.command_id,commandState:r.command_state,
       idempotencyKey:r.idempotency_key,requestParams:r.request_params,firstSubmittedAt:r.first_submitted_at,
-      leaseGeneration:BigInt(r.lease_generation),leaseOwner:r.lease_owner,leaseExpiresAt:r.lease_expires_at});
+      commandNow:r.command_now,nextAttemptAt:r.next_attempt_at,commandAttempts:r.attempt_count,leaseGeneration:BigInt(r.lease_generation),leaseOwner:r.lease_owner,leaseExpiresAt:r.lease_expires_at});
     await client.query('COMMIT'); return value;
   } catch(error) { await client.query('ROLLBACK').catch(()=>{}); throw error; }
   finally { client.release(); }
@@ -80,8 +83,8 @@ export async function requestBalanceCheckout(pool:Pool,bookingId:string,recheckA
       WHERE a.obligation_id=$1 AND a.state IN ('CREATING','OPEN','RECONCILING') FOR UPDATE OF a,pc`,[d.id]);
     if (existing.rows[0]) { await client.query('COMMIT'); return {attemptId:existing.rows[0].attempt_id,commandId:existing.rows[0].command_id}; }
     const attemptId=randomUUID(),commandId=randomUUID();
-    await client.query(`INSERT INTO payment_attempts(id,booking_id,obligation_id,state,expected_cents,currency,version)
-      VALUES($1,$2,$3,'CREATING',$4,'EUR',1)`,[attemptId,bookingId,d.id,d.amount_cents]);
+    await client.query(`INSERT INTO payment_attempts(id,booking_id,obligation_id,state,expected_cents,currency,version,recovery_enabled,recovery_next_attempt_at)
+      VALUES($1,$2,$3,'CREATING',$4,'EUR',1,true,clock_timestamp()+interval '30 seconds')`,[attemptId,bookingId,d.id,d.amount_cents]);
     await client.query(`INSERT INTO provider_commands(id,kind,payment_attempt_id,logical_key,stripe_idempotency_key,request_fingerprint,state)
       VALUES($1,'SESSION_CREATE',$2,$3,$4,$5,'PENDING')`,[commandId,attemptId,
         `balance-session:${attemptId}`,`balance-session:${attemptId}`,
@@ -118,19 +121,20 @@ export async function dispatchBalanceSessionCreate(pool:Pool,gateway:StripeGatew
   if (!/^[A-Za-z0-9:_-]{8,100}$/.test(workerId)) throw new Error('Invalid worker identity');
   const claim=await withBalanceLock(pool,attemptId,async(client,c) => {
     if (c.commandState==='RESOLVED' && c.attemptState==='OPEN' && c.sessionId && c.checkoutUrl &&
-        c.sessionExpiresAt && c.sessionExpiresAt.getTime()>Date.now() && c.status==='CONFIRMED')
+        c.sessionExpiresAt && c.sessionExpiresAt.getTime()>c.commandNow.getTime() && c.status==='CONFIRMED')
       return {status:'READY' as const,url:c.checkoutUrl,sessionId:c.sessionId};
     if (c.commandState==='QUARANTINED') return {status:'QUARANTINED' as const};
     if (c.status!=='CONFIRMED' || !['PENDING','SUBMITTED','UNKNOWN'].includes(c.commandState) ||
-        (c.leaseExpiresAt && c.leaseExpiresAt.getTime()>Date.now())) return {status:'PENDING' as const};
-    if (c.firstSubmittedAt && Date.now()-c.firstSubmittedAt.getTime()>=86_400_000 ||
+        (c.nextAttemptAt && c.nextAttemptAt.getTime()>c.commandNow.getTime()) ||
+        (c.leaseExpiresAt && c.leaseExpiresAt.getTime()>c.commandNow.getTime())) return {status:'PENDING' as const};
+    if (c.firstSubmittedAt && (c.commandNow.getTime()-c.firstSubmittedAt.getTime()>=86_400_000 || !c.requestParams) ||
         c.commandState!=='PENDING' && !c.firstSubmittedAt) {
       await client.query("UPDATE provider_commands SET state='QUARANTINED',last_error_code='IDEMPOTENCY_AGE_UNSAFE',lease_owner=NULL,lease_expires_at=NULL WHERE id=$1",[c.commandId]);
       return {status:'QUARANTINED' as const};
     }
     const fresh:CheckoutRequest={correlation:{bookingId:c.bookingId,attemptId:c.attemptId,commandId:c.commandId},
       paymentPurpose:'BALANCE',
-      amountCents:Number(c.expectedCents),expiresAt:Math.floor(Date.now()/1000)+1830,
+      amountCents:Number(c.expectedCents),expiresAt:Math.floor(c.commandNow.getTime()/1000)+1830,
       successUrl:urls.successUrl,cancelUrl:urls.cancelUrl,idempotencyKey:c.idempotencyKey};
     if (!Number.isSafeInteger(fresh.amountCents) || fresh.amountCents<=0) throw new Error('Invalid balance amount');
     const request=c.requestParams??fresh;
@@ -143,30 +147,34 @@ export async function dispatchBalanceSessionCreate(pool:Pool,gateway:StripeGatew
     await client.query(`UPDATE provider_commands SET request_params=COALESCE(request_params,$2::jsonb),
       first_submitted_at=COALESCE(first_submitted_at,clock_timestamp()),state='SUBMITTED',lease_owner=$3,
       lease_expires_at=clock_timestamp()+interval '2 minutes',lease_generation=$4,
-      attempt_count=attempt_count+1,last_attempt_at=clock_timestamp() WHERE id=$1`,
+      attempt_count=attempt_count+1,last_attempt_at=clock_timestamp(),next_attempt_at=NULL WHERE id=$1`,
       [c.commandId,JSON.stringify(request),workerId,generation.toString()]);
     return {request,generation,commandId:c.commandId};
   });
   if (!('request' in claim) || !claim.request) return claim as CheckoutDispatch;
+  const submission=await sessionSubmissionGate(pool,claim.commandId,workerId,claim.generation);
+  if (submission!=='SUBMIT') return {status:submission};
   let session:CheckoutSession;
   try { session=await gateway.createSession(claim.request); }
   catch {
-    await withBalanceLock(pool,attemptId,async(client,c)=>{
-      if (c.commandId!==claim.commandId || c.leaseGeneration!==claim.generation || c.leaseOwner!==workerId) return;
+    const retried=await withBalanceLock(pool,attemptId,async(client,c)=>{
+      if (c.commandId!==claim.commandId || c.leaseGeneration!==claim.generation || c.leaseOwner!==workerId ||
+          !c.leaseExpiresAt || c.leaseExpiresAt.getTime()<=c.commandNow.getTime()) return false;
       await client.query("UPDATE payment_attempts SET state='RECONCILING',version=version+1 WHERE id=$1 AND state='CREATING'",[attemptId]);
-      await client.query("UPDATE provider_commands SET state='UNKNOWN',lease_owner=NULL,lease_expires_at=NULL,last_error_code='CREATE_OUTCOME_UNKNOWN' WHERE id=$1",[c.commandId]);
+      await client.query("UPDATE provider_commands SET state='UNKNOWN',lease_owner=NULL,lease_expires_at=NULL,last_error_code='CREATE_OUTCOME_UNKNOWN',next_attempt_at=clock_timestamp()+($2*interval '1 second') WHERE id=$1",[c.commandId,commandRetrySeconds(c.commandAttempts)]);
+      return true;
     });
-    return {status:'PENDING'};
+    return {status:'PENDING',retryScheduled:retried};
   }
   return withBalanceLock(pool,attemptId,async(client,c):Promise<CheckoutDispatch>=>{
-    if (c.commandId!==claim.commandId || c.leaseGeneration!==claim.generation || c.leaseOwner!==workerId ||
+    if (c.commandId!==claim.commandId || c.leaseGeneration!==claim.generation || c.leaseOwner!==workerId || !c.leaseExpiresAt || c.leaseExpiresAt.getTime()<=c.commandNow.getTime() ||
         c.status!=='CONFIRMED') return {status:'PENDING'};
     if (!matching(session,c,gateway.accountId)) {
       await client.query("UPDATE payment_attempts SET state='RECONCILING',version=version+1 WHERE id=$1 AND state='CREATING'",[attemptId]);
-      await client.query("UPDATE provider_commands SET state='UNKNOWN',lease_owner=NULL,lease_expires_at=NULL,last_error_code='SESSION_EVIDENCE_MISMATCH' WHERE id=$1",[c.commandId]);
-      return {status:'PENDING'};
+      await client.query("UPDATE provider_commands SET state='UNKNOWN',lease_owner=NULL,lease_expires_at=NULL,last_error_code='SESSION_EVIDENCE_MISMATCH',next_attempt_at=clock_timestamp()+($2*interval '1 second') WHERE id=$1",[c.commandId,commandRetrySeconds(c.commandAttempts)]);
+      return {status:'PENDING',retryScheduled:true};
     }
-    const open=!!session.url && session.status==='open' && session.paymentStatus==='unpaid' && session.expiresAt*1000>Date.now();
+    const open=!!session.url && session.status==='open' && session.paymentStatus==='unpaid' && session.expiresAt*1000>c.commandNow.getTime();
     await client.query(`UPDATE payment_attempts SET state=$2,stripe_session_id=$3,checkout_url=$4,
       session_created_at=to_timestamp($5),session_expires_at=to_timestamp($6),version=version+1 WHERE id=$1`,
       [attemptId,open?'OPEN':'RECONCILING',session.id,session.url,session.created,session.expiresAt]);
@@ -323,11 +331,22 @@ export async function reconcileBalanceAttempt(pool:Pool,gateway:StripeGateway,at
   });
 }
 
-/** Trusted callable recovery, with no scheduling or cancellation side effects.
+/** Scheduled balance recovery shares the initial lane's durable metadata contract. */
+export function recoverBalanceAttempts(pool:Pool,gateway:StripeGateway,limit=10,options:RecoveryOptions={}) {
+  return recoverPaymentAttempts(pool,gateway,'BALANCE',reconcileBalanceAttempt,limit,options);
+}
+export async function sweepBalanceAttempts(pool:Pool,gateway:StripeGateway,limit=10,
+  onlyBookingId?:string):Promise<ReconcileResult[]> {
+  if (onlyBookingId) return reconcileScopedBookingBalances(pool,gateway,limit,onlyBookingId);
+  const batch=await recoverBalanceAttempts(pool,gateway,limit);
+  return batch.items.flatMap(item=>item.result?[item.result]:[]);
+}
+
+/** Explicit booking-scoped legacy domain reconciliation; not an automation scan.
  * Unknown creations without a Session ID remain with command recovery/investigation;
  * this sweep never repeats a Session-create POST to discover them.
  */
-export async function sweepBalanceAttempts(pool:Pool,gateway:StripeGateway,limit=10,
+async function reconcileScopedBookingBalances(pool:Pool,gateway:StripeGateway,limit=10,
   onlyBookingId?:string):Promise<ReconcileResult[]> {
   if (!Number.isSafeInteger(limit) || limit<1 || limit>25) throw new RangeError('Invalid batch size');
   const candidates=await pool.query<{id:string}>(`SELECT a.id FROM payment_attempts a

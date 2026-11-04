@@ -1,4 +1,5 @@
 import 'server-only';
+import { recoverPaymentAttempts, type RecoveryOptions } from './payment-recovery';
 import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
 import { withInitialLock, type InitialContext } from './payment-locks';
@@ -246,12 +247,11 @@ async function recordSuccess(pool:Pool,attemptId:string,s:CheckoutSession,p:Paym
   });
 }
 
+/** Scheduled recovery requires enrollment; direct reconciliation remains authoritative. */
+export function recoverInitialAttempts(pool:Pool,gateway:StripeGateway,limit=10,options:RecoveryOptions={}) {
+  return recoverPaymentAttempts(pool,gateway,'INITIAL',reconcileInitialAttempt,limit,options);
+}
 export async function sweepInitialAttempts(pool:Pool,gateway:StripeGateway,limit=10):Promise<ReconciliationResult[]> {
-  if (!Number.isSafeInteger(limit) || limit<1 || limit>25) throw new RangeError('Invalid batch size');
-  const candidates=await pool.query<{id:string}>(`SELECT id FROM payment_attempts WHERE hold_id IS NOT NULL
-    AND stripe_session_id IS NOT NULL AND state IN ('OPEN','RECONCILING','EXPIRED')
-    ORDER BY created_at LIMIT $1`,[limit]);
-  const results:ReconciliationResult[]=[];
-  for (const candidate of candidates.rows) results.push(await reconcileInitialAttempt(pool,gateway,candidate.id));
-  return results;
+  const batch=await recoverInitialAttempts(pool,gateway,limit);
+  return batch.items.flatMap(item=>item.result?[item.result]:[]);
 }

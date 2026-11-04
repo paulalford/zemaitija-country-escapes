@@ -246,6 +246,13 @@
       "when": 1793038526264,
       "tag": "0034_public_synthetic_guest",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1793577600000,
+      "tag": "0035_payment_recovery_schedule",
+      "breakpoints": true
     }
   ]
 }

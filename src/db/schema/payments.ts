@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, uuid, text, integer, bigint, timestamp, char, type AnyPgColumn } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, bigint, timestamp, char, boolean, check, index, type AnyPgColumn } from "drizzle-orm/pg-core";
 import { bookings } from "./booking";
 import { inventory_holds } from "./booking";
 import { provider_incidents } from "./operations";
@@ -32,7 +32,31 @@ export const payment_attempts = pgTable("payment_attempts", {
   last_reconciliation_id: uuid("last_reconciliation_id").references((): AnyPgColumn => reconciliation_records.id, { onDelete: "restrict" }),
   version: integer("version").notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+  recovery_enabled: boolean("recovery_enabled").notNull().default(false),
+  recovery_next_attempt_at: timestamp("recovery_next_attempt_at", { withTimezone: true }),
+  recovery_lease_owner: text("recovery_lease_owner"),
+  recovery_lease_until: timestamp("recovery_lease_until", { withTimezone: true }),
+  recovery_lease_generation: bigint("recovery_lease_generation", { mode: "bigint" }).notNull().default(sql`0`),
+  recovery_failure_count: integer("recovery_failure_count").notNull().default(0),
+}, (table) => [
+  index("payment_attempts_recovery_due").on(table.recovery_next_attempt_at, table.id)
+    .where(sql`recovery_enabled AND recovery_next_attempt_at IS NOT NULL`),
+  check("payment_recovery_metadata_valid", sql`  recovery_lease_generation >= 0 AND recovery_failure_count >= 0
+  AND (recovery_lease_owner IS NULL) = (recovery_lease_until IS NULL)
+  AND (recovery_lease_owner IS NULL OR (
+    recovery_lease_owner ~ '^[A-Za-z0-9:_-]{8,100}$'
+    AND recovery_lease_generation > 0
+    AND recovery_next_attempt_at IS NOT NULL
+    AND isfinite(recovery_lease_until)
+  ))
+  AND (recovery_next_attempt_at IS NULL OR isfinite(recovery_next_attempt_at))
+  AND (recovery_enabled OR (
+    recovery_next_attempt_at IS NULL AND recovery_lease_owner IS NULL
+    AND recovery_lease_until IS NULL AND recovery_lease_generation = 0
+    AND recovery_failure_count = 0
+  ))
+  AND (NOT recovery_enabled OR recovery_next_attempt_at IS NOT NULL OR state = 'SUCCEEDED')`),
+]);
 
 export const payment_records = pgTable("payment_records", {
   id: uuid("id").primaryKey().notNull(),

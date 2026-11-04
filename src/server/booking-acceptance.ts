@@ -95,7 +95,7 @@ export async function acceptBooking(pool: Pool, request: AcceptanceRequest, opti
       await client.query("INSERT INTO inventory_holds(id,booking_id,state,started_at,version) VALUES($1,$2,'CREATING',$3,1)", [holdId,bookingId,instant]);
       await client.query("INSERT INTO inventory_claims(id,unit_id,arrival_date,departure_date,hold_id,version) VALUES($1,$2,$3,$4,$5,1)", [claimId,q.unitId,q.arrivalDate,q.departureDate,holdId]);
       if (options.failAfter === 'CLAIM') throw new Error('test transaction interruption');
-      await client.query("INSERT INTO payment_attempts(id,booking_id,obligation_id,hold_id,state,expected_cents,currency,version) VALUES($1,$2,$3,$4,'CREATING',$5,'EUR',1)", [attemptId,bookingId,initialId,holdId,split.initialCents.toString()]);
+      await client.query("INSERT INTO payment_attempts(id,booking_id,obligation_id,hold_id,state,expected_cents,currency,version,recovery_enabled,recovery_next_attempt_at) VALUES($1,$2,$3,$4,'CREATING',$5,'EUR',1,true,clock_timestamp()+interval '30 seconds')", [attemptId,bookingId,initialId,holdId,split.initialCents.toString()]);
       await client.query('UPDATE inventory_holds SET payment_attempt_id=$1 WHERE id=$2', [attemptId,holdId]);
       await client.query(`INSERT INTO provider_commands(id,kind,payment_attempt_id,logical_key,stripe_idempotency_key,request_fingerprint,state)
         VALUES($1,'SESSION_CREATE',$2,$3,$4,$5,'PENDING')`, [commandId,attemptId,`session-create:${request.operationKey}`,`session-create:${attemptId}`,fingerprint]);
