@@ -1,13 +1,10 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
 import { Pool, type PoolClient } from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-if (existsSync(".env.local")) process.loadEnvFile(".env.local");
-const url = new URL(process.env.MIGRATION_DATABASE_URL ?? "");
-if (!(["127.0.0.1", "localhost"].includes(url.hostname) && url.pathname.endsWith("_dev"))) {
-  throw new Error("Database integration tests require the localhost development database");
-}
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 const pool = new Pool({ connectionString: url.toString(), max: 4 });
 const ids = { unit: randomUUID(), guest: randomUUID(), booking: randomUUID(), hold: randomUUID(), admin: randomUUID() };
 const today = new Date("2027-04-01T12:00:00Z");

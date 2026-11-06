@@ -1,14 +1,13 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool, type PoolClient } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { planned, seed } from '../scripts/seed-reference.mjs';
 import { quoteInTransaction, quoteStay, QuoteError } from '../src/server/quote';
-import { addCalendarDays, countNights, provisionalDayClass, quoteDeadlines, splitPayment, MAX_EUR_CENTS, addCents } from '../src/server/quote-math';
+import { addCalendarDays } from '../src/server/quote-math';
 
-if (existsSync('.env.local')) process.loadEnvFile('.env.local');
-const url = new URL(process.env.MIGRATION_DATABASE_URL ?? '');
-if (!['localhost','127.0.0.1'].includes(url.hostname) || !url.pathname.endsWith('_dev')) throw new Error('Local dev DB required');
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 process.env.ALLOW_DEV_REFERENCE_SEED = '1';
 const pool = new Pool({ connectionString: url.toString() });
 const units = planned();
@@ -17,43 +16,6 @@ const beforeD = new Date('2027-06-17T11:59:59Z');
 
 beforeAll(async () => seed(url.toString()));
 afterAll(async () => pool.end());
-
-describe('quote calendar and money functions', () => {
-  it('classifies Friday/Saturday provisionally as weekend and Sunday/Monday as weekday', () => {
-    expect(['2027-07-02','2027-07-03','2027-07-04','2027-07-05'].map(provisionalDayClass)).toEqual(['WEEKEND','WEEKEND','WEEKDAY','WEEKDAY']);
-    expect(countNights(input(0,'2027-12-31','2028-01-01'))).toBe(1);
-    expect(addCalendarDays('2027-12-31',1)).toBe('2028-01-01');
-  });
-  it('keeps the provisional calendar processing bound at 366 nights', () => {
-    expect(countNights(input(0,'2027-01-01',addCalendarDays('2027-01-01',366)))).toBe(366);
-    expect(() => countNights(input(0,'2027-01-01',addCalendarDays('2027-01-01',367)))).toThrow(RangeError);
-  });
-  it('keeps years 0001–0099 literal and rejects four-digit calendar overflow', () => {
-    expect(addCalendarDays('0099-12-31', 1)).toBe('0100-01-01');
-    expect(addCalendarDays('0001-01-01', 1)).toBe('0001-01-02');
-    expect(provisionalDayClass('0099-12-31')).toBe('WEEKDAY');
-    expect(provisionalDayClass('1999-12-31')).toBe('WEEKEND');
-    expect(() => addCalendarDays('0001-01-01', -1)).toThrow(RangeError);
-    expect(() => addCalendarDays('9999-12-31', 1)).toThrow(RangeError);
-    expect(() => addCalendarDays('0099-02-29', 1)).toThrow(RangeError);
-    expect(() => quoteDeadlines('0099-12-31')).toThrow(/Unsupported Vilnius offset/);
-  });
-  it('rounds 10001 cents to 3000/7001 and uses FULL at the exact deadline', () => {
-    const d = new Date('2027-01-01T00:00:00Z');
-    expect(splitPayment(10001n,new Date(d.getTime()-1),d)).toEqual({ basis:'ADVANCE', initialCents:3000n, balanceCents:7001n });
-    expect(splitPayment(10001n,d,d)).toEqual({ basis:'FULL', initialCents:10001n, balanceCents:0n });
-    expect(splitPayment(1n,new Date(d.getTime()-1),d).initialCents).toBe(0n);
-    expect(() => addCents(MAX_EUR_CENTS,1n)).toThrow(RangeError);
-  });
-  it('computes local-calendar deadlines across both Vilnius DST changes', () => {
-    const april = quoteDeadlines('2027-04-10');
-    expect(april.balance.toISOString()).toBe('2027-03-27T13:00:00.000Z');
-    expect(april.grace.toISOString()).toBe('2027-03-28T13:00:00.000Z');
-    const november = quoteDeadlines('2027-11-13');
-    expect(november.balance.toISOString()).toBe('2027-10-30T12:00:00.000Z');
-    expect(november.grace.toISOString()).toBe('2027-10-31T12:00:00.000Z');
-  });
-});
 
 describe('real PostgreSQL quote preview', () => {
   it('returns coded invalid input for 367 nights while 366 reaches rate validation', async () => {

@@ -1,5 +1,5 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { createSign, generateKeyPairSync, randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool } from 'pg';
 import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest';
 import { planned, seed } from '../scripts/seed-reference.mjs';
@@ -19,11 +19,10 @@ import { startAdminLogin, finishAdminLogin } from '../src/server/admin-auth';
 import { cancelBooking } from '../src/server/cancellation';
 import { approveCancellationAssessment } from '../src/server/cancellation-assessment';
 
-if(existsSync('.env.local'))process.loadEnvFile('.env.local');
-const url=new URL(process.env.MIGRATION_DATABASE_URL??'');
-if(!['localhost','127.0.0.1'].includes(url.hostname)||!url.pathname.endsWith('_dev'))throw new Error('Local dev database required');
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 process.env.ALLOW_DEV_REFERENCE_SEED='1';process.env.APP_ORIGIN='http://localhost:3000';process.env.ACCESS_SECRET='a'.repeat(64);
-const admin=new Pool({connectionString:url.toString(),max:8}),runtime=new Pool({connectionString:process.env.DATABASE_URL,max:8});
+const admin=new Pool({connectionString:url.toString(),max:8}),runtime=new Pool({connectionString:m19.runtimeUrl,max:8});
 const urls={successUrl:'http://localhost:3000/return',cancelUrl:'http://localhost:3000/cancel'};
 beforeAll(async()=>{await seed(url.toString());});
 afterAll(async()=>{await runtime.end();await admin.end();});

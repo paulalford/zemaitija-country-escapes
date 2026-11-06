@@ -1,5 +1,2 @@
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  resolve: { alias: { '@': new URL('./src', import.meta.url).pathname, 'server-only': new URL('./tests/server-only-stub.ts', import.meta.url).pathname } },
-});
+// Default test discovery is offline-safe. PostgreSQL remains separately gated.
+export { default } from './vitest.offline.config.mts';

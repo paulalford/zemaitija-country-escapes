@@ -1,13 +1,12 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool } from 'pg';
 import { beforeAll, afterAll, describe, expect, it } from 'vitest';
 import { planned, seed } from '../scripts/seed-reference.mjs';
 
-if (existsSync('.env.local')) process.loadEnvFile('.env.local');
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 process.env.ALLOW_DEV_REFERENCE_SEED = '1';
-const url = new URL(process.env.MIGRATION_DATABASE_URL ?? '');
-if (!['127.0.0.1', 'localhost'].includes(url.hostname) || !url.pathname.endsWith('_dev')) throw new Error('Local development database required');
 const pool = new Pool({ connectionString: url.toString() });
 const units = planned();
 

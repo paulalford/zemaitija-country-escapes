@@ -1,5 +1,5 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool } from 'pg';
 import Stripe from 'stripe';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -12,9 +12,8 @@ import { reconcileInitialAttempt } from '../src/server/payment-reconciliation';
 import { ingestStripeWebhook, processWebhookInbox, WebhookInputError } from '../src/server/stripe-webhooks';
 import { StripeSdkGateway, type CheckoutRequest, type CheckoutSession, type PaymentEvidence, type StripeGateway } from '../src/server/stripe-adapter';
 
-if (existsSync('.env.local')) process.loadEnvFile('.env.local');
-const url=new URL(process.env.MIGRATION_DATABASE_URL??'');
-if (!['localhost','127.0.0.1'].includes(url.hostname) || !url.pathname.endsWith('_dev')) throw new Error('Local dev DB required');
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 process.env.ALLOW_DEV_REFERENCE_SEED='1';
 const pool=new Pool({connectionString:url.toString(),max:12});
 const beforeD=new Date('2027-06-18T11:59:59Z');
@@ -105,7 +104,7 @@ async function signedEvent(type:string,objectType:string,objectId:string) {
 describe('Milestone 10 Stripe test-mode initial payment',()=>{
   it('locks an accepted initial attempt as the restricted role without obligation UPDATE or a provider call',async()=>{
     const {accepted}=await fixture();
-    const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:2});
+    const runtime=new Pool({connectionString:m19.runtimeUrl,max:2});
     try {
       const grants=await runtime.query(`SELECT current_user role,
         has_table_privilege(current_user,'payment_obligations','UPDATE') table_update,
@@ -133,7 +132,7 @@ describe('Milestone 10 Stripe test-mode initial payment',()=>{
   });
   it('allocates as the restricted role while retaining parent locks and budget rejection',async()=>{
     const {unit,guest}=await fixture();
-    const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:1});
+    const runtime=new Pool({connectionString:m19.runtimeUrl,max:1});
     const client=await runtime.connect();
     try {
       await client.query('BEGIN');
@@ -166,7 +165,7 @@ describe('Milestone 10 Stripe test-mode initial payment',()=>{
   });
   it('confirms a synthetic initial capture through the restricted role without Stripe',async()=>{
     const {accepted}=await fixture(),provider=new FakeGateway();
-    const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:3});
+    const runtime=new Pool({connectionString:m19.runtimeUrl,max:3});
     try {
       expect((await dispatchSessionCreate(runtime,provider,accepted.attemptId,'worker-m10-runtime',urls)).status).toBe('READY');
       provider.pay();
@@ -234,7 +233,7 @@ describe('Milestone 10 Stripe test-mode initial payment',()=>{
     const {accepted}=await fixture();
     await expect(pool.query("UPDATE payment_attempts SET state='SUCCEEDED' WHERE id=$1",[accepted.attemptId]))
       .rejects.toMatchObject({code:'23514'});
-    const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:1});
+    const runtime=new Pool({connectionString:m19.runtimeUrl,max:1});
     try {
       const grants=await runtime.query(`SELECT current_user role,
         has_table_privilege(current_user,'payment_records','INSERT') record_insert,

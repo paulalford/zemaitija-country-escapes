@@ -1,12 +1,11 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool, type PoolClient } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { checkAvailability, isInventoryConflict, type AvailabilityInput } from '../src/server/availability';
 
-if (existsSync('.env.local')) process.loadEnvFile('.env.local');
-const url = new URL(process.env.MIGRATION_DATABASE_URL ?? '');
-if (!['localhost', '127.0.0.1'].includes(url.hostname) || !url.pathname.endsWith('_dev')) throw new Error('Local disposable development database required');
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 const pool = new Pool({ connectionString: url.toString(), max: 6 });
 const unitIds = [randomUUID(), randomUUID(), randomUUID()];
 const guest = randomUUID(), admin = randomUUID();

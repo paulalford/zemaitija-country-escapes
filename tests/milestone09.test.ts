@@ -1,5 +1,5 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool } from 'pg';
 import { afterAll, describe, expect, it } from 'vitest';
 import { planned, seed } from '../scripts/seed-reference.mjs';
@@ -7,9 +7,8 @@ import { quoteStay } from '../src/server/quote';
 import { acceptBooking, type AcceptanceRequest } from '../src/server/booking-acceptance';
 import { abandonBeforeDispatch, agedCreatingHolds, inspectHold, leaseSessionCommand, markHoldReconciling } from '../src/server/pending-holds';
 
-if (existsSync('.env.local')) process.loadEnvFile('.env.local');
-const url = new URL(process.env.MIGRATION_DATABASE_URL ?? '');
-if (!['127.0.0.1','localhost'].includes(url.hostname) || !url.pathname.endsWith('_dev')) throw new Error('Local disposable dev DB required');
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 const pool = new Pool({connectionString:url.toString(),max:12});
 process.env.ALLOW_DEV_REFERENCE_SEED = '1';
 afterAll(async () => pool.end());
@@ -34,7 +33,7 @@ async function request(f: Awaited<ReturnType<typeof fixture>>, arrival='2027-07-
   return {operationKey:key,guestId:f.guest,locale:'en',quote,termsVersion:'SYNTHETIC_TEST_TERMS_V1',acceptedTerms:true,acknowledgedInitialCents:quote.previewSplit.initialCents,syntheticPortfolioOnly:true};
 }
 function runtimePool() {
-  const appUrl=new URL(process.env.DATABASE_URL!);
+  const appUrl=new URL(m19.runtimeUrl);
   appUrl.pathname=url.pathname;
   return new Pool({connectionString:appUrl.toString()});
 }
@@ -153,7 +152,7 @@ describe('Milestone 9 PostgreSQL acceptance', () => {
   });
   it('accepts through the scoped runtime role without migration privileges', async () => {
     const f=await fixture(), r=await request(f);
-    const appUrl=new URL(process.env.DATABASE_URL!);
+    const appUrl=new URL(m19.runtimeUrl);
     appUrl.pathname=url.pathname;
     const app=new Pool({connectionString:appUrl.toString()});
     try {

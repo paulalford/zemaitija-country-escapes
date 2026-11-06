@@ -1,5 +1,5 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { planned, seed } from '../scripts/seed-reference.mjs';
@@ -13,12 +13,11 @@ import { paymentPosition } from '../src/server/payment-position';
 import { ingestStripeWebhook, processWebhookInbox } from '../src/server/stripe-webhooks';
 import type { CheckoutRequest, CheckoutSession, PaymentEvidence, StripeGateway } from '../src/server/stripe-adapter';
 
-if (existsSync('.env.local')) process.loadEnvFile('.env.local');
-const url=new URL(process.env.MIGRATION_DATABASE_URL??'');
-if (!['localhost','127.0.0.1'].includes(url.hostname) || !url.pathname.endsWith('_dev')) throw new Error('Local dev DB required');
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 process.env.ALLOW_DEV_REFERENCE_SEED='1';
 const admin=new Pool({connectionString:url.toString(),max:8});
-const runtime=new Pool({connectionString:process.env.DATABASE_URL,max:8});
+const runtime=new Pool({connectionString:m19.runtimeUrl,max:8});
 const urls={successUrl:'http://localhost:3000/return',cancelUrl:'http://localhost:3000/cancel'};
 beforeAll(async()=>{
   const guard=await admin.query(`SELECT 1 FROM pg_trigger WHERE tgrelid='payment_attempts'::regclass

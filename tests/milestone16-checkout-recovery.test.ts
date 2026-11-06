@@ -1,5 +1,5 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { seed } from '../scripts/seed-reference.mjs';
@@ -13,14 +13,10 @@ import { stripeGateway, type CheckoutRequest, type CheckoutSession } from '../sr
 vi.mock('../src/server/stripe-adapter', async original => ({
   ...await original<typeof import('../src/server/stripe-adapter')>(), stripeGateway: vi.fn(),
 }));
-if (existsSync('.env.local')) process.loadEnvFile('.env.local');
-const url = new URL(process.env.MIGRATION_DATABASE_URL ?? '');
-// Never run these write fixtures against the existing development database.
-if (!['localhost', '127.0.0.1'].includes(url.hostname) || url.pathname !== '/zemaitija_m16_phase_b_20261026_dev') {
-  throw Error('M16-S01 requires the existing disposable Milestone 16 database');
-}
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
 const owner = new Pool({ connectionString: url.toString() });
-const runtimeUrl = new URL(process.env.DATABASE_URL!);
+const runtimeUrl = new URL(m19.runtimeUrl);
 runtimeUrl.pathname = url.pathname;
 const runtime = new Pool({ connectionString: runtimeUrl.toString() });
 const validUrl = 'https://checkout.stripe.com/c/pay/cs_test_m16_recovery';

@@ -1,14 +1,13 @@
+import { m19DatabaseTarget } from './helpers/m19-database-target';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { seed } from '../scripts/seed-reference.mjs';
 import { publicCatalog } from '../src/server/public-catalog';
 import { previewPublicStay, acceptPublicStay, publicBookingStatus } from '../src/server/public-booking';
-if(existsSync('.env.local'))process.loadEnvFile('.env.local');
-const url=new URL(process.env.MIGRATION_DATABASE_URL??'');
-if(!['localhost','127.0.0.1'].includes(url.hostname)||!url.pathname.endsWith('_dev'))throw Error('Disposable local dev database required');
-const owner=new Pool({connectionString:url.toString()});const runtimeUrl=new URL(process.env.DATABASE_URL!);runtimeUrl.pathname=url.pathname;
+const m19 = m19DatabaseTarget();
+const url = new URL(m19.migrationUrl);
+const owner=new Pool({connectionString:url.toString()});const runtimeUrl=new URL(m19.runtimeUrl);runtimeUrl.pathname=url.pathname;
 const runtime=new Pool({connectionString:runtimeUrl.toString()});
 const browser='p'.repeat(43);
 beforeAll(async()=>{process.env.ALLOW_DEV_REFERENCE_SEED='1';await seed(url.toString());process.env.APP_ORIGIN='http://localhost:3000';process.env.ACCESS_SECRET='ef'.repeat(32);});
