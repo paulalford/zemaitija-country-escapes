@@ -42,3 +42,12 @@
 .booking-main .quote-stay h2{font-size:2rem}
 /* Long unspaced policy words and the synthetic reference must remain readable without a hyphenation dictionary. */
 .booking-main .demo-terms p{overflow-wrap:break-word}
+
+/* M18: reading pages inherit Timber's paper, type and ruled booking sections. */
+.timber .reading-main{max-width:850px;overflow-wrap:anywhere}
+.timber .reading-main h2{font-size:2rem;line-height:1.2}
+.reading-index{border-top:1px solid var(--rule);margin-top:2rem;padding-top:1rem}
+.reading-index ul{padding-left:1.25rem;margin:0}
+.reading-index a,.footer-nav a{display:inline-flex;align-items:center;min-height:44px}
+.footer-nav{display:flex;flex-wrap:wrap;gap:.25rem 1.5rem}
+.reading-main h2{scroll-margin-top:1rem}

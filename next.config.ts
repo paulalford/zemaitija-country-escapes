@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
     ];
     const destinationHeaders=headers.map(header => header.key==='Referrer-Policy' ? {...header,value:'strict-origin-when-cross-origin'} : header.key==='Content-Security-Policy' ? {...header,value:header.value.replace("img-src 'self' data:","img-src 'self' data: https://tile.openstreetmap.org")} : header);
     const destinationRoutes=['/explore','/experiences','/:locale(lt|en|de)/explore','/:locale(lt|en|de)/experiences'].map(source=>({source,headers:destinationHeaders}));
-    return [...destinationRoutes, ...['/manage/:path*','/admin/:path*','/api/access/:path*','/api/booking/:path*','/booking/:path*','/accommodations/:path*','/','/:locale(lt|en|de)','/:locale(lt|en|de)/booking/:path*','/:locale(lt|en|de)/accommodations/:path*','/:locale(lt|en|de)/manage/:path*','/:locale(lt|en|de)/admin/:path*'].map(source=>({source,headers}))];
+    return [...destinationRoutes, ...['/privacy','/terms','/:locale(lt|en|de)/privacy','/:locale(lt|en|de)/terms','/robots.txt','/sitemap.xml','/manage/:path*','/admin/:path*','/api/access/:path*','/api/booking/:path*','/booking/:path*','/accommodations/:path*','/','/:locale(lt|en|de)','/:locale(lt|en|de)/booking/:path*','/:locale(lt|en|de)/accommodations/:path*','/:locale(lt|en|de)/manage/:path*','/:locale(lt|en|de)/admin/:path*'].map(source=>({source,headers}))];
   },
 };
 export default nextConfig;

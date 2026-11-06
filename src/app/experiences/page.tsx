@@ -1,3 +1,4 @@
+import { publicMetadata } from '@/i18n/publication';
 import { getPresentation } from '@/i18n/server';
 import { destinations, destinationGroups, destinationMarkers, findDestination, type DestinationCategory, type DestinationGroup } from '@/content/destinations';
 import { PublicShell, Arrow } from '../public-ui/shell';
@@ -29,3 +30,5 @@ export default async function ExperiencesPage({ searchParams }: { searchParams: 
     <StayReturn/>
   </main></PublicShell>;
 }
+
+export async function generateMetadata() { const {locale}=await getPresentation(); return publicMetadata(locale,'/experiences'); }

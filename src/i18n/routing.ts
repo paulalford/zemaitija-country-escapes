@@ -12,7 +12,7 @@ export function localePath(locale: Locale, path: string): string {
   if (!isLocale(locale) || !path.startsWith('/') || path.startsWith('//') || /[%\\\x00-\x20#]/.test(path.split('?')[0]) || path.includes('#')) throw new RangeError('Invalid local page');
   const url = new URL(path, 'https://local.invalid');
   const base = stripLocale(url.pathname);
-  if (!/^\/(?:explore|experiences|accommodations(?:\/(?:forest-cottage|lakeside-cabin|family-cottage))?|booking(?:\/(?:return|cancel))?|manage(?:\/access)?|admin(?:\/(?:signin|bookings(?:\/[a-f0-9-]{36})?|calendar|incidents|identities))?)?$/.test(base)) throw new RangeError('Unknown local page');
+  if (!/^\/(?:privacy|terms|explore|experiences|accommodations(?:\/(?:forest-cottage|lakeside-cabin|family-cottage))?|booking(?:\/(?:return|cancel))?|manage(?:\/access)?|admin(?:\/(?:signin|bookings(?:\/[a-f0-9-]{36})?|calendar|incidents|identities))?)?$/.test(base)) throw new RangeError('Unknown local page');
   const query = new URLSearchParams();
   if (base === '/explore' || base === '/experiences') {
     const allowed = { destination: /^(L0[1-7]|R0[1-7]|E0[1-3])$/, area: /^(local|regional|excursion)$/, interest: /^(nature|walking|viewpoint|heritage|culture|pilgrimage|history|excursion)$/ };

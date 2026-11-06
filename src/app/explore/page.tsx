@@ -1,3 +1,4 @@
+import { publicMetadata } from '@/i18n/publication';
 import { getPresentation } from '@/i18n/server';
 import { destinations, findDestination } from '@/content/destinations';
 import { PublicShell, Arrow } from '../public-ui/shell';
@@ -18,3 +19,5 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
     <StayReturn/>
   </main></PublicShell>;
 }
+
+export async function generateMetadata() { const {locale}=await getPresentation(); return publicMetadata(locale,'/explore'); }
